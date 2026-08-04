@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "calmIcon.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
