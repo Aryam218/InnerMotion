@@ -1,12 +1,4 @@
 //
-//  TaskPriority.swift
-//  InnerMotion
-//
-//  Created by sabaalzuqzuq on 22/02/1448 AH.
-//
-
-
-//
 //  EditTaskView.swift
 //  team15
 //
@@ -31,9 +23,13 @@ struct EditTaskView: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var taskDescription: String = "Study for math test"
-    @State private var selectedPriority: TaskPriority = .high
+    @State private var selectedPriority: TaskPriority? = nil
     @State private var dueDate: Date = Calendar.current.date(from: DateComponents(year: 2026, month: 4, day: 1)) ?? Date()
     @State private var showDatePicker = false
+
+    private var isFormComplete: Bool {
+        !taskDescription.trimmingCharacters(in: .whitespaces).isEmpty && selectedPriority != nil
+    }
 
     private let primary = Color(red: 0.216, green: 0.0, blue: 0.541)     // 37008A
     private let secondary = Color(red: 0.337, green: 0.239, blue: 0.416) // 563D6A
@@ -155,7 +151,9 @@ struct EditTaskView: View {
                 Button(action: {
                     // TODO: persist the edited task (taskDescription, selectedPriority, dueDate)
                     // to your actual data source/model here before dismissing.
-                    print("Saving task: \(taskDescription), priority: \(selectedPriority.rawValue), due: \(dateFormatter.string(from: dueDate))")
+                    if let selectedPriority {
+                        print("Saving task: \(taskDescription), priority: \(selectedPriority.rawValue), due: \(dateFormatter.string(from: dueDate))")
+                    }
                     dismiss()
                 }) {
                     Text("Edit the task")
@@ -166,6 +164,8 @@ struct EditTaskView: View {
                         .background(buttonColor)
                         .clipShape(RoundedRectangle(cornerRadius: 32))
                 }
+                .disabled(!isFormComplete)
+                .opacity(isFormComplete ? 1 : 0.55)
                 .padding(.horizontal, 24)
                 .padding(.bottom, 24)
             }

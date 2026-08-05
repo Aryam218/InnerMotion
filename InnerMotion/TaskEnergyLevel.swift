@@ -1,12 +1,4 @@
 //
-//  TaskEnergyLevel.swift
-//  InnerMotion
-//
-//  Created by sabaalzuqzuq on 22/02/1448 AH.
-//
-
-
-//
 //  PlanYourDayView.swift
 //  team15
 //
@@ -67,11 +59,15 @@ enum TimeOption: Equatable {
 struct PlanYourDayView: View {
     @Environment(\.dismiss) private var dismiss
 
-    @State private var selectedEnergy: TaskEnergyLevel = .high
-    @State private var selectedTime: TimeOption = .fifteenMin
+    @State private var selectedEnergy: TaskEnergyLevel? = nil
+    @State private var selectedTime: TimeOption? = nil
     @State private var isHomePressed = false
     @State private var showCustomTimePicker = false
     @State private var customMinutes: Int = 45
+
+    private var isFormComplete: Bool {
+        selectedEnergy != nil && selectedTime != nil
+    }
 
     private let primary = Color(red: 0.216, green: 0.0, blue: 0.541)       // 37008A
     private let secondary = Color(red: 0.337, green: 0.239, blue: 0.416)   // 563D6A
@@ -82,6 +78,15 @@ struct PlanYourDayView: View {
 
     private let timeOptions: [TimeOption] = [.fifteenMin, .thirtyMin, .oneHour, .more(minutes: nil)]
     private let columns = [GridItem(.flexible()), GridItem(.flexible())]
+
+    // Shows the custom minute value on the "More" button once one's been picked,
+    // otherwise falls back to the option's default label.
+    private func displayLabel(for option: TimeOption) -> String {
+        if option.baseCase == 3, let selectedTime, selectedTime.baseCase == 3 {
+            return selectedTime.label
+        }
+        return option.label
+    }
 
     var body: some View {
         ZStack {
@@ -177,12 +182,12 @@ struct PlanYourDayView: View {
                                         selectedTime = option
                                     }
                                 }) {
-                                    Text(option.baseCase == 3 && selectedTime.baseCase == 3 ? selectedTime.label : option.label)
+                                    Text(displayLabel(for: option))
                                         .font(.system(size: 18))
                                         .foregroundStyle(secondary)
                                         .frame(maxWidth: .infinity)
                                         .padding(.vertical, 26)
-                                        .background(selectedTime.baseCase == option.baseCase ? selectedTimeBackground : fieldBackground)
+                                        .background(selectedTime?.baseCase == option.baseCase ? selectedTimeBackground : fieldBackground)
                                         .clipShape(RoundedRectangle(cornerRadius: 24))
                                 }
                             }
@@ -204,6 +209,8 @@ struct PlanYourDayView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 32))
                 }
                 .buttonStyle(.plain)
+                .disabled(!isFormComplete)
+                .opacity(isFormComplete ? 1 : 0.55)
                 .padding(.horizontal, 24)
                 .padding(.bottom, 24)
             }
