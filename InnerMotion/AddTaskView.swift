@@ -10,6 +10,9 @@ import SwiftUI
 struct AddTaskView: View {
     @Environment(\.dismiss) private var dismiss
 
+    // حالة التحكم بالانتقال إلى MyTasksView
+    @State private var navigateToMyTasks = false
+
     // حالات حفظ البيانات المربعة من الواجهة
     @State private var taskDescription: String = ""
     @State private var selectedPriority: TaskPriority? = nil // يربط مع Enum الموحد بالمرشح
@@ -34,6 +37,11 @@ struct AddTaskView: View {
     var body: some View {
         ZStack {
             pageBackground.ignoresSafeArea()
+
+            // ربط مخفي ينتقل إلى MyTasksView عند تفعيل المتغير
+            NavigationLink(destination: MyTasksView(), isActive: $navigateToMyTasks) {
+                EmptyView()
+            }
 
             VStack(spacing: 0) {
                 // Back button (زر الرجوع للهوم بيج)
@@ -156,7 +164,7 @@ struct AddTaskView: View {
                 // Add Task Button (Pinned at bottom)
                 Button(action: {
                     print("Task Added: \(taskDescription)")
-                    dismiss()
+                    navigateToMyTasks = true
                 }) {
                     Text("Add the task")
                         .font(Font.title3.bold())
