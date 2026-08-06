@@ -204,7 +204,7 @@ struct HomeView: View {
             }
             
             // 4. شريط التنقل السفلي
-            CustomTabBar()        }
+            CustomTabBar(selectedTab: $selectedTab)        }
         .navigationBarBackButtonHidden(true)
     }
 }
