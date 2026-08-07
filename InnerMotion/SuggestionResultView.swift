@@ -39,8 +39,8 @@ struct SuggestionResultView: View {
 
                     Spacer()
 
-                    Button {
-                        // لاحقًا نربطه بصفحة الهوم
+                    NavigationLink {
+                        HomeView()
                     } label: {
                         Image(systemName: "house")
                             .font(.system(size: 27, weight: .semibold))
@@ -132,21 +132,40 @@ struct SuggestionResultView: View {
 
                 Spacer(minLength: 24)
 
-                // MARK: - Start Activity
+                // MARK: - Buttons
 
-                NavigationLink {
-                    FeedbackView()
-                } label: {
-                    Text("Start Activity")
-                        .font(.system(size: 22, weight: .regular))
-                        .foregroundStyle(.white)
-                        .frame(width: 300, height: 50)
-                        .background(
-                            Capsule()
-                                .fill(Color(hex: "75608E"))
-                        )
+                VStack(spacing: 10) {
+
+                    // Start Activity
+                    NavigationLink {
+                        FeedbackView()
+                    } label: {
+                        Text("Start Activity")
+                            .font(.system(size: 22, weight: .regular))
+                            .foregroundStyle(.white)
+                            .frame(width: 300, height: 50)
+                            .background(
+                                Capsule()
+                                    .fill(Color(hex: "75608E"))
+                            )
+                    }
+                    .buttonStyle(.plain)
+
+                    // Another Idea
+                    Button {
+                        // لاحقًا هنا نطلب اقتراح جديد من الـ AI
+                    } label: {
+                        Text("Another Idea")
+                            .font(.system(size: 22, weight: .regular))
+                            .foregroundStyle(.white)
+                            .frame(width: 300, height: 50)
+                            .background(
+                                Capsule()
+                                    .fill(Color(hex: "A897BD"))
+                            )
+                    }
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
                 .padding(.bottom, 30)
             }
         }

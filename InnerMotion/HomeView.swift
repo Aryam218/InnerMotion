@@ -10,6 +10,10 @@ import SwiftUI
 struct HomeView: View {
     @State private var selectedTab: Int = 0
     
+    @State private var showSuggestionCategories = false
+    @State private var showMyTasks = false
+    @State private var showAchievements = false
+    
     var body: some View {
         ZStack(alignment: .bottom) {
             // خلفية الصفحة البيج
@@ -125,6 +129,10 @@ struct HomeView: View {
                         .frame(maxWidth: .infinity)
                         .background(Color(red: 0.86, green: 0.89, blue: 0.78))
                         .cornerRadius(22)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            showSuggestionCategories = true
+                        }
                     }
                     .padding(.horizontal, 20)
                     
@@ -164,12 +172,17 @@ struct HomeView: View {
                                             
                                             Capsule()
                                                 .fill(Color(red: 0.45, green: 0.35, blue: 0.6))
-                                                .frame(width: geo.size.width * 0.55, height: 4)
+                                                .frame(
+                                                    width: geo.size.width * 0.55,
+                                                    height: 4
+                                                )
                                             
                                             Circle()
                                                 .fill(Color(red: 0.3, green: 0.15, blue: 0.45))
                                                 .frame(width: 8, height: 8)
-                                                .offset(x: (geo.size.width * 0.55) - 4)
+                                                .offset(
+                                                    x: (geo.size.width * 0.55) - 4
+                                                )
                                         }
                                     }
                                     .frame(height: 8)
@@ -183,19 +196,32 @@ struct HomeView: View {
                                 HStack(spacing: 4) {
                                     Text("Continue Task")
                                         .font(.system(size: 12, weight: .medium))
+                                    
                                     Image(systemName: "chevron.right")
                                         .font(.system(size: 9, weight: .bold))
                                 }
                                 .foregroundColor(.white)
                                 .padding(.vertical, 8)
                                 .padding(.horizontal, 16)
-                                .background(Color(red: 0.45, green: 0.38, blue: 0.58))
+                                .background(
+                                    Color(
+                                        red: 0.45,
+                                        green: 0.38,
+                                        blue: 0.58
+                                    )
+                                )
                                 .cornerRadius(18)
                             }
                         }
                         .padding(18)
                         .frame(maxWidth: .infinity)
-                        .background(Color(red: 0.95, green: 0.93, blue: 0.94))
+                        .background(
+                            Color(
+                                red: 0.95,
+                                green: 0.93,
+                                blue: 0.94
+                            )
+                        )
                         .cornerRadius(22)
                     }
                     .padding(.horizontal, 24)
@@ -204,8 +230,41 @@ struct HomeView: View {
             }
             
             // 4. شريط التنقل السفلي
-            CustomTabBar(selectedTab: $selectedTab)        }
+            CustomTabBar(selectedTab: $selectedTab)
+                .padding(.horizontal, 18)
+                .padding(.bottom, 10)
+        }
         .navigationBarBackButtonHidden(true)
+        
+        // ربط البطاقة الخضراء
+        .navigationDestination(
+            isPresented: $showSuggestionCategories
+        ) {
+            SuggestionCategoryView()
+        }
+        /*
+        // التنقل من الناف بار
+        .onChange(of: selectedTab) { _, newTab in
+            if newTab == 1 {
+                showMyTasks = true
+            } else if newTab == 2 {
+                showAchievements = true
+            }
+        }
+        
+        .navigationDestination(
+            isPresented: $showMyTasks
+        ) {
+            TaskListView()
+        }
+         
+        
+        .navigationDestination(
+            isPresented: $showAchievements
+        ) {
+            MyAchievementJar()
+        }
+         */
     }
 }
 

@@ -35,8 +35,8 @@ struct FeedbackView: View {
 
                     Spacer()
 
-                    Button {
-                        // لاحقًا نربطه بصفحة الهوم
+                    NavigationLink {
+                        HomeView()
                     } label: {
                         Image(systemName: "house")
                             .font(.system(size: 27, weight: .semibold))
@@ -115,7 +115,7 @@ struct FeedbackView: View {
                 RoundedRectangle(cornerRadius: 12)
                     .fill(
                         isSelected
-                        ? Color(hex: "E8DDF6")
+                        ? option.selectedColor
                         : Color(hex: "F5F0F0")
                     )
             )
@@ -275,6 +275,23 @@ enum FeedbackOption: String, CaseIterable, Identifiable {
             return .easier
         }
     }
+
+    // لون الكارد عند الاختيار
+    var selectedColor: Color {
+        switch self {
+        case .helpful:
+            return Color(hex: "CBD5B3")
+
+        case .somewhatHelpful:
+            return Color(hex: "F7D3B1")
+
+        case .notForMe:
+            return Color(hex: "FFCDCD")
+
+        case .needSomethingEasier:
+            return Color(hex: "E8DDF6")
+        }
+    }
 }
 
 enum FeedbackFaceType {
@@ -289,3 +306,4 @@ enum FeedbackFaceType {
         FeedbackView()
     }
 }
+

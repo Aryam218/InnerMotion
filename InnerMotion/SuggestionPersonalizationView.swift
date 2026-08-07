@@ -45,8 +45,8 @@ struct SuggestionPersonalizationView: View {
 
                     Spacer()
 
-                    Button {
-                        // لاحقًا نربطه بالهوم الأساسي
+                    NavigationLink {
+                        HomeView()
                     } label: {
                         Image(systemName: "house")
                             .font(.system(size: 27, weight: .semibold))
