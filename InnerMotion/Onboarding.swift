@@ -35,7 +35,7 @@ struct OnboardingView: View {
                 Spacer() // يدفع الزر للأسفل
                 
                 // زر Get Started في الأسفل
-                NavigationLink(destination: HomeView()) {
+                NavigationLink(destination: MainTabView()) {
                     Text("Get Started")
                         .font(.system(size: 18, weight: .semibold))
                         .foregroundColor(.white)

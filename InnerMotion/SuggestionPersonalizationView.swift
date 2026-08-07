@@ -46,7 +46,7 @@ struct SuggestionPersonalizationView: View {
                     Spacer()
 
                     NavigationLink {
-                        HomeView()
+                        MainTabView()
                     } label: {
                         Image(systemName: "house")
                             .font(.system(size: 27, weight: .semibold))

@@ -8,11 +8,8 @@
 import SwiftUI
 
 struct HomeView: View {
-    @State private var selectedTab: Int = 0
     
     @State private var showSuggestionCategories = false
-    @State private var showMyTasks = false
-    @State private var showAchievements = false
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -30,19 +27,37 @@ struct HomeView: View {
                             Button(action: {}) {
                                 Image(systemName: "bell")
                                     .font(.system(size: 26, weight: .regular))
-                                    .foregroundColor(Color(red: 0.28, green: 0.18, blue: 0.42))
+                                    .foregroundColor(
+                                        Color(
+                                            red: 0.28,
+                                            green: 0.18,
+                                            blue: 0.42
+                                        )
+                                    )
                             }
                         }
                         .padding(.top, 5)
                         
                         Text("Welcome to Inner Motion")
                             .font(.system(size: 28, weight: .bold))
-                            .foregroundColor(Color(red: 0.22, green: 0.05, blue: 0.48))
+                            .foregroundColor(
+                                Color(
+                                    red: 0.22,
+                                    green: 0.05,
+                                    blue: 0.48
+                                )
+                            )
                             .multilineTextAlignment(.center)
                         
                         Text("Small steps, real progress.")
                             .font(.system(size: 18))
-                            .foregroundColor(Color(red: 0.4, green: 0.3, blue: 0.5))
+                            .foregroundColor(
+                                Color(
+                                    red: 0.4,
+                                    green: 0.3,
+                                    blue: 0.5
+                                )
+                            )
                             .multilineTextAlignment(.center)
                     }
                     .padding(.horizontal, 24)
@@ -51,7 +66,13 @@ struct HomeView: View {
                     VStack(alignment: .leading, spacing: 16) {
                         Text("What would help you right now?")
                             .font(.system(size: 17, weight: .medium))
-                            .foregroundColor(Color(red: 0.35, green: 0.25, blue: 0.45))
+                            .foregroundColor(
+                                Color(
+                                    red: 0.35,
+                                    green: 0.25,
+                                    blue: 0.45
+                                )
+                            )
                             .padding(.leading, 2)
                         
                         // البطاقة الأولى (البنفسجية) - noise
@@ -71,25 +92,49 @@ struct HomeView: View {
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text("I have a task, but I\ncan’t start")
                                         .font(.system(size: 16, weight: .bold))
-                                        .foregroundColor(Color(red: 0.22, green: 0.05, blue: 0.48))
+                                        .foregroundColor(
+                                            Color(
+                                                red: 0.22,
+                                                green: 0.05,
+                                                blue: 0.48
+                                            )
+                                        )
                                         .multilineTextAlignment(.leading)
                                         .lineSpacing(2)
                                     
                                     Text("Help me begin, step by step")
                                         .font(.system(size: 12))
-                                        .foregroundColor(Color(red: 0.45, green: 0.35, blue: 0.55))
+                                        .foregroundColor(
+                                            Color(
+                                                red: 0.45,
+                                                green: 0.35,
+                                                blue: 0.55
+                                            )
+                                        )
                                 }
                                 
                                 Spacer(minLength: 0)
                                 
                                 Image(systemName: "chevron.right")
                                     .font(.system(size: 14, weight: .bold))
-                                    .foregroundColor(Color(red: 0.35, green: 0.25, blue: 0.45))
+                                    .foregroundColor(
+                                        Color(
+                                            red: 0.35,
+                                            green: 0.25,
+                                            blue: 0.45
+                                        )
+                                    )
                             }
                             .padding(.horizontal, 16)
                             .padding(.vertical, 18)
                             .frame(maxWidth: .infinity)
-                            .background(Color(red: 0.92, green: 0.89, blue: 0.97))
+                            .background(
+                                Color(
+                                    red: 0.92,
+                                    green: 0.89,
+                                    blue: 0.97
+                                )
+                            )
                             .cornerRadius(22)
                         }
                         
@@ -109,25 +154,49 @@ struct HomeView: View {
                             VStack(alignment: .leading, spacing: 4) {
                                 Text("I don’t know what I need to\ndo right now")
                                     .font(.system(size: 15, weight: .bold))
-                                    .foregroundColor(Color(red: 0.2, green: 0.1, blue: 0.4))
+                                    .foregroundColor(
+                                        Color(
+                                            red: 0.2,
+                                            green: 0.1,
+                                            blue: 0.4
+                                        )
+                                    )
                                     .multilineTextAlignment(.leading)
                                     .lineSpacing(2)
                                 
                                 Text("Suggest something for me to do")
                                     .font(.system(size: 12))
-                                    .foregroundColor(Color(red: 0.4, green: 0.35, blue: 0.5))
+                                    .foregroundColor(
+                                        Color(
+                                            red: 0.4,
+                                            green: 0.35,
+                                            blue: 0.5
+                                        )
+                                    )
                             }
                             
                             Spacer(minLength: 0)
                             
                             Image(systemName: "chevron.right")
                                 .font(.system(size: 14, weight: .bold))
-                                .foregroundColor(Color(red: 0.35, green: 0.25, blue: 0.45))
+                                .foregroundColor(
+                                    Color(
+                                        red: 0.35,
+                                        green: 0.25,
+                                        blue: 0.45
+                                    )
+                                )
                         }
                         .padding(.horizontal, 15)
                         .padding(.vertical, 18)
                         .frame(maxWidth: .infinity)
-                        .background(Color(red: 0.86, green: 0.89, blue: 0.78))
+                        .background(
+                            Color(
+                                red: 0.86,
+                                green: 0.89,
+                                blue: 0.78
+                            )
+                        )
                         .cornerRadius(22)
                         .contentShape(Rectangle())
                         .onTapGesture {
@@ -140,28 +209,58 @@ struct HomeView: View {
                     VStack(alignment: .leading, spacing: 12) {
                         Text("Continue where you left off")
                             .font(.system(size: 17, weight: .medium))
-                            .foregroundColor(Color(red: 0.35, green: 0.25, blue: 0.45))
+                            .foregroundColor(
+                                Color(
+                                    red: 0.35,
+                                    green: 0.25,
+                                    blue: 0.45
+                                )
+                            )
                             .padding(.leading, 2)
                         
                         VStack(alignment: .trailing, spacing: 12) {
                             HStack(alignment: .top, spacing: 16) {
                                 RoundedRectangle(cornerRadius: 16)
-                                    .fill(Color(red: 0.9, green: 0.86, blue: 0.94))
+                                    .fill(
+                                        Color(
+                                            red: 0.9,
+                                            green: 0.86,
+                                            blue: 0.94
+                                        )
+                                    )
                                     .frame(width: 58, height: 58)
                                     .overlay(
                                         Image(systemName: "book")
                                             .font(.system(size: 24))
-                                            .foregroundColor(Color(red: 0.35, green: 0.2, blue: 0.55))
+                                            .foregroundColor(
+                                                Color(
+                                                    red: 0.35,
+                                                    green: 0.2,
+                                                    blue: 0.55
+                                                )
+                                            )
                                     )
                                 
                                 VStack(alignment: .leading, spacing: 5) {
                                     Text("Study for math test")
                                         .font(.system(size: 15, weight: .bold))
-                                        .foregroundColor(Color(red: 0.22, green: 0.05, blue: 0.48))
+                                        .foregroundColor(
+                                            Color(
+                                                red: 0.22,
+                                                green: 0.05,
+                                                blue: 0.48
+                                            )
+                                        )
                                     
                                     Text("Step 2 of 4")
                                         .font(.system(size: 12))
-                                        .foregroundColor(Color(red: 0.5, green: 0.4, blue: 0.6))
+                                        .foregroundColor(
+                                            Color(
+                                                red: 0.5,
+                                                green: 0.4,
+                                                blue: 0.6
+                                            )
+                                        )
                                     
                                     // شريط التقدم
                                     GeometryReader { geo in
@@ -171,14 +270,26 @@ struct HomeView: View {
                                                 .frame(height: 4)
                                             
                                             Capsule()
-                                                .fill(Color(red: 0.45, green: 0.35, blue: 0.6))
+                                                .fill(
+                                                    Color(
+                                                        red: 0.45,
+                                                        green: 0.35,
+                                                        blue: 0.6
+                                                    )
+                                                )
                                                 .frame(
                                                     width: geo.size.width * 0.55,
                                                     height: 4
                                                 )
                                             
                                             Circle()
-                                                .fill(Color(red: 0.3, green: 0.15, blue: 0.45))
+                                                .fill(
+                                                    Color(
+                                                        red: 0.3,
+                                                        green: 0.15,
+                                                        blue: 0.45
+                                                    )
+                                                )
                                                 .frame(width: 8, height: 8)
                                                 .offset(
                                                     x: (geo.size.width * 0.55) - 4
@@ -228,11 +339,6 @@ struct HomeView: View {
                 }
                 .padding(.bottom, 110)
             }
-            
-            // 4. شريط التنقل السفلي
-            CustomTabBar(selectedTab: $selectedTab)
-                .padding(.horizontal, 18)
-                .padding(.bottom, 10)
         }
         .navigationBarBackButtonHidden(true)
         
@@ -242,32 +348,10 @@ struct HomeView: View {
         ) {
             SuggestionCategoryView()
         }
-        /*
-        // التنقل من الناف بار
-        .onChange(of: selectedTab) { _, newTab in
-            if newTab == 1 {
-                showMyTasks = true
-            } else if newTab == 2 {
-                showAchievements = true
-            }
-        }
-        
-        .navigationDestination(
-            isPresented: $showMyTasks
-        ) {
-            TaskListView()
-        }
-         
-        
-        .navigationDestination(
-            isPresented: $showAchievements
-        ) {
-            MyAchievementJar()
-        }
-         */
     }
 }
 
 #Preview {
     HomeView()
 }
+
