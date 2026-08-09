@@ -154,24 +154,14 @@ struct StarRewardView: View {
             .padding(.horizontal, 24)
             .padding(.top, 20)
 
-            // MARK: - Achievement Jar
-
-            NavigationLink(
-                destination: MyAchievmentJar()
-            ) {
-
-                Text(
-                    "View My Achievement Jar"
-                )
-                .font(.headline)
-                .foregroundColor(.white)
-                .padding(.vertical, 12)
-                .padding(.horizontal, 28)
-                .background(
-                    Color(
-                        red: 126/255,
-                        green: 106/255,
-                        blue: 158/255
+            NavigationLink(destination: MyAchievmentJar(animateStarDrop: true)) {
+                Text("View My Achievement Jar")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .padding(.vertical, 12)
+                    .padding(.horizontal, 28)
+                    .background(
+                        Color(red: 126/255, green: 106/255, blue: 158/255)
                     )
                 )
                 .cornerRadius(25)

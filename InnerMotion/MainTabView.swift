@@ -9,7 +9,13 @@ import SwiftUI
 
 struct MainTabView: View {
 
-    @State private var selectedTab: Int = 0
+    @State private var selectedTab: Int
+
+    // تقدرين تمررين تاب ابتدائي (مثلاً لما توصلين من صفحة ثانية وتبين تفتح على تاب معين)
+    // الافتراضي 0 (Home) لو ما مررتي شي.
+    init(initialTab: Int = 0) {
+        _selectedTab = State(initialValue: initialTab)
+    }
 
     var body: some View {
         ZStack(alignment: .bottom) {
