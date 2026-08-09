@@ -86,7 +86,7 @@ struct StarRewardView: View {
             .padding(.horizontal, 24)
             .padding(.top, 20)
 
-            NavigationLink(destination: MyAchievmentJar()) {
+            NavigationLink(destination: MyAchievmentJar(animateStarDrop: true)) {
                 Text("View My Achievement Jar")
                     .font(.headline)
                     .foregroundColor(.white)
