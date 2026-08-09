@@ -7,11 +7,16 @@ struct PlanOneTask: View {
 
     @Environment(\.dismiss) private var dismiss
 
+    // اختياري: لو الصفحة اللي قبلها تبي تتحكم بزر الباك بنفسها
+    // (مثلاً ترجع لصفحة معينة بدل الافتراضي)، تقدر تمرر onBack.
+    // لو ما مررتيه، بيشتغل dismiss() العادي زي ما هو حاليًا.
+    var onBack: (() -> Void)? = nil
+
     @State private var goToFocusOneStep = false
+    @State private var goToLoadingPlan = false
 
     var body: some View {
 
-        NavigationStack {
         ZStack {
 
             Color.backgroundColor
@@ -25,7 +30,11 @@ struct PlanOneTask: View {
 
                     Button {
 
-                        dismiss()
+                        if let onBack {
+                            onBack()
+                        } else {
+                            dismiss()
+                        }
 
                     } label: {
 
@@ -36,8 +45,8 @@ struct PlanOneTask: View {
 
                     Spacer()
 
-                    Button {
-
+                    NavigationLink {
+                        MainTabView()
                     } label: {
 
                         Image(systemName: "house")
@@ -119,6 +128,8 @@ struct PlanOneTask: View {
 
                 Button {
 
+                    goToLoadingPlan = true
+
                 } label: {
 
                     Text("Make it Easier")
@@ -130,13 +141,14 @@ struct PlanOneTask: View {
                 .buttonStyle(PressableCapsuleStyle(fillColor: .secondaryButton))
                 .padding(.horizontal,35)
                 .padding(.bottom,35)
+                .navigationDestination(isPresented: $goToLoadingPlan) {
+                    LoadingPlanView()
+                }
 
             }
 
         }
         .toolbar(.hidden, for: .navigationBar)
-
-        }
 
     }
 }
@@ -183,5 +195,7 @@ struct StepCard: View {
 
 
 #Preview {
-    PlanOneTask()
+    NavigationStack {
+        PlanOneTask()
+    }
 }

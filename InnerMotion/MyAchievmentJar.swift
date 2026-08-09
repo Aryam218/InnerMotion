@@ -34,7 +34,7 @@ struct MyAchievmentJar: View {
                         Image("star")
                             .resizable()
                             .scaledToFit()
-                            .frame(width: 110, height: 110)
+                            .frame(width: 300, height: 300)
                             .offset(y: earnedStar ? 350 : -120)
                             .scaleEffect(earnedStar ? 0.7 : 1)
                             .animation(.easeInOut(duration: 1.5), value: earnedStar)

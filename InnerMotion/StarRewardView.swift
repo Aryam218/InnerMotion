@@ -12,7 +12,7 @@ struct StarRewardView: View {
                 Image("star")
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 180, height: 180)
+                    .frame(width: 350, height: 350)
                     .offset(y: -210)
                 
                 

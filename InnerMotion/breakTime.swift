@@ -20,8 +20,8 @@ struct breakTime: View {
                 HStack {
                     Spacer()
 
-                    Button {
-
+                    NavigationLink {
+                        MainTabView()
                     } label: {
                         Image(systemName: "house")
                             .font(.system(size: 28))

@@ -105,9 +105,9 @@ struct PlanYourDayView: View {
 
                     Spacer()
 
-                    Button(action: {
-                        // handle home navigation
-                    }) {
+                    NavigationLink {
+                        MainTabView()
+                    } label: {
                         Image(systemName: "house")
                             .font(.system(size: 24))
                             .foregroundStyle(buttonColor.opacity(isHomePressed ? 0.5 : 1.0))
@@ -251,5 +251,7 @@ struct PlanYourDayView: View {
 }
 
 #Preview {
-    PlanYourDayView()
+    NavigationStack {
+        PlanYourDayView()
+    }
 }
