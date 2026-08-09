@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct InnerMotionApp: App {
@@ -13,5 +14,7 @@ struct InnerMotionApp: App {
         WindowGroup {
             ContentView()
         }
+        .modelContainer(for: UserTask.self)
     }
 }
+
