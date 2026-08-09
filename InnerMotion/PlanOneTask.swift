@@ -7,6 +7,7 @@ import SwiftData
 struct PlanOneTask: View {
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
 
     // المهمة الحقيقية الناتجة من AI
     let task: PlannedTask
@@ -16,7 +17,13 @@ struct PlanOneTask: View {
 
     @State private var goToFocusOneStep = false
 
+    // MARK: - Make It Easier State
+
+    @State private var isMakingEasier = false
+    @State private var makeItEasierError: String? = nil
+
     private var orderedSteps: [TaskStep] {
+
         task.steps.sorted {
             $0.order < $1.order
         }
@@ -166,12 +173,36 @@ struct PlanOneTask: View {
                     minLength: 20
                 )
 
+                // MARK: - Error Message
+
+                if let makeItEasierError {
+
+                    Text(makeItEasierError)
+                        .font(
+                            .system(size: 13)
+                        )
+                        .foregroundStyle(.red)
+                        .multilineTextAlignment(
+                            .center
+                        )
+                        .padding(
+                            .horizontal,
+                            35
+                        )
+                        .padding(
+                            .bottom,
+                            8
+                        )
+                }
+
                 // MARK: - Start First Step
 
                 Button {
 
                     if !orderedSteps.isEmpty {
-                        goToFocusOneStep = true
+
+                        goToFocusOneStep =
+                            true
                     }
 
                 } label: {
@@ -187,14 +218,19 @@ struct PlanOneTask: View {
                 }
                 .buttonStyle(
                     PressableCapsuleStyle(
-                        fillColor: .primaryButton
+                        fillColor:
+                            .primaryButton
                     )
                 )
                 .disabled(
                     orderedSteps.isEmpty
+                    ||
+                    isMakingEasier
                 )
                 .opacity(
                     orderedSteps.isEmpty
+                    ||
+                    isMakingEasier
                     ? 0.55
                     : 1
                 )
@@ -208,35 +244,69 @@ struct PlanOneTask: View {
                         $goToFocusOneStep
                 ) {
 
-                    // بنعدله بعدين ليستقبل
-                    // الخطوة الحقيقية
-                    FocusOneStep(task: task)
+                    FocusOneStep(
+                        task: task
+                    )
                 }
 
                 // MARK: - Make It Easier
 
                 Button {
 
-                    // بنربطه لاحقًا بالـ AI
-                    // لإعادة تقسيم نفس المهمة
-                    // إلى خطوات أسهل
+                    Task {
+
+                        await makeTaskEasier()
+                    }
 
                 } label: {
 
-                    Text("Make it Easier")
-                        .font(
-                            .system(size: 28)
-                        )
-                        .frame(
-                            maxWidth: .infinity
-                        )
-                        .frame(height: 60)
+                    HStack(
+                        spacing: 10
+                    ) {
+
+                        if isMakingEasier {
+
+                            ProgressView()
+                                .tint(
+                                    .primaryText
+                                )
+
+                            Text(
+                                "Making it Easier..."
+                            )
+
+                        } else {
+
+                            Text(
+                                "Make it Easier"
+                            )
+                        }
+                    }
+                    .font(
+                        .system(size: 28)
+                    )
+                    .frame(
+                        maxWidth: .infinity
+                    )
+                    .frame(height: 60)
                 }
                 .buttonStyle(
                     PressableCapsuleStyle(
                         fillColor:
                             .secondaryButton
                     )
+                )
+                .disabled(
+                    orderedSteps.isEmpty
+                    ||
+                    isMakingEasier
+                )
+                .opacity(
+                    orderedSteps.isEmpty
+                    ||
+                    isMakingEasier
+                    ? 0.55
+                    : 1
                 )
                 .padding(
                     .horizontal,
@@ -252,6 +322,135 @@ struct PlanOneTask: View {
             .hidden,
             for: .navigationBar
         )
+    }
+
+
+    // MARK: - Make Task Easier
+
+    @MainActor
+    private func makeTaskEasier() async {
+
+        guard !isMakingEasier else {
+            return
+        }
+
+        guard !orderedSteps.isEmpty else {
+            return
+        }
+
+        isMakingEasier = true
+
+        makeItEasierError = nil
+
+        do {
+
+            // MARK: Ask AI
+
+            let easierPlan =
+                try await
+                TaskPlanningService
+                    .shared
+                    .makeTaskEasier(
+                        task: task
+                    )
+
+            guard
+                !easierPlan.steps.isEmpty
+            else {
+
+                makeItEasierError =
+                    "The AI did not return any steps."
+
+                isMakingEasier =
+                    false
+
+                return
+            }
+
+            // MARK: Build New Steps
+
+            let newSteps =
+                easierPlan.steps
+                    .enumerated()
+                    .map {
+                        index,
+                        generatedStep in
+
+                        TaskStep(
+
+                            order:
+                                index + 1,
+
+                            text:
+                                generatedStep.text,
+
+                            estimatedMinutes:
+                                generatedStep
+                                    .estimatedMinutes,
+
+                            isCompleted:
+                                false
+                        )
+                    }
+
+            // MARK: Remove Old Steps
+
+            let oldSteps =
+                Array(task.steps)
+
+            /*
+             نحذف الخطوات القديمة من SwiftData.
+
+             ما نحذف PlannedTask نفسها.
+             المهمة نفسها تبقى:
+             - بنفس العنوان
+             - بنفس sessionID
+             - بنفس Priority
+             - بنفس Due Date
+             */
+
+            for oldStep in
+                oldSteps {
+
+                modelContext.delete(
+                    oldStep
+                )
+            }
+
+            // MARK: Replace Relationship
+
+            task.steps =
+                newSteps
+
+            // إدخال الخطوات الجديدة
+            for newStep in
+                newSteps {
+
+                modelContext.insert(
+                    newStep
+                )
+            }
+
+            // MARK: Save
+
+            try modelContext.save()
+
+            print(
+                "Task made easier successfully: \(task.title)"
+            )
+
+        } catch {
+
+            print(
+                "Make it easier failed: \(error)"
+            )
+
+            makeItEasierError =
+                error.localizedDescription
+        }
+
+        isMakingEasier =
+            false
     }
 }
 
@@ -313,4 +512,56 @@ struct StepCard: View {
         )
         .padding(.horizontal)
     }
+}
+
+
+// MARK: - Preview
+
+#Preview {
+
+    let step1 = TaskStep(
+        order: 1,
+        text: "Open the lecture slides",
+        estimatedMinutes: 2
+    )
+
+    let step2 = TaskStep(
+        order: 2,
+        text: "Read the first title only",
+        estimatedMinutes: 3
+    )
+
+    let step3 = TaskStep(
+        order: 3,
+        text: "Highlight one line",
+        estimatedMinutes: 2
+    )
+
+    let previewTask = PlannedTask(
+        title: "Study for math exam",
+        priority: "High",
+        order: 1,
+        planningSessionID: UUID(),
+        steps: [
+            step1,
+            step2,
+            step3
+        ]
+    )
+
+    NavigationStack {
+
+        PlanOneTask(
+            task: previewTask
+        )
+    }
+    .modelContainer(
+        for: [
+            UserTask.self,
+            DayPlan.self,
+            PlannedTask.self,
+            TaskStep.self
+        ],
+        inMemory: true
+    )
 }

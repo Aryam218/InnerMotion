@@ -163,7 +163,7 @@ struct StarRewardView: View {
                     .background(
                         Color(red: 126/255, green: 106/255, blue: 158/255)
                     )
-                )
+                
                 .cornerRadius(25)
             }
             .padding(.top, 690)

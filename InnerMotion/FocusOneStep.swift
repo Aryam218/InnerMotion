@@ -20,6 +20,9 @@ struct FocusOneStep: View {
     @State private var goToBreakTime = false
     @State private var goToStarReward = false
 
+    // يمنع محاولة تغيير الحالة أكثر من مرة
+    @State private var hasMarkedInProgress = false
+
     // ترتيب الخطوات حسب رقمها
     private var orderedSteps: [TaskStep] {
         task.steps.sorted {
@@ -384,10 +387,15 @@ struct FocusOneStep: View {
             }
         }
 
-        // إذا رجع المستخدم للصفحة
-        // يبدأ من أول Step غير مكتملة
+        // MARK: - On Appear
+
         .onAppear {
+
+            // يرجع لأول خطوة غير مكتملة
             moveToFirstIncompleteStep()
+
+            // أول ما يبدأ المهمة تتحول إلى In Progress
+            markTaskAsInProgress()
         }
 
         .animation(
@@ -490,6 +498,77 @@ struct FocusOneStep: View {
                     orderedSteps.count - 1,
                     0
                 )
+        }
+    }
+
+    // MARK: - Mark Task In Progress
+
+    private func markTaskAsInProgress() {
+
+        guard !hasMarkedInProgress else {
+            return
+        }
+
+        hasMarkedInProgress = true
+
+        let normalizedTitle =
+            task.title
+                .trimmingCharacters(
+                    in: .whitespacesAndNewlines
+                )
+                .lowercased()
+
+        let descriptor =
+            FetchDescriptor<UserTask>()
+
+        do {
+
+            let userTasks =
+                try modelContext.fetch(
+                    descriptor
+                )
+
+            guard let originalTask =
+                    userTasks.first(
+                        where: {
+
+                            $0.title
+                                .trimmingCharacters(
+                                    in: .whitespacesAndNewlines
+                                )
+                                .lowercased()
+                            ==
+                            normalizedTitle
+                        }
+                    )
+            else {
+
+                print(
+                    "Original UserTask not found for: \(task.title)"
+                )
+
+                return
+            }
+
+            // فقط المهمة الجديدة تتحول إلى In Progress
+            // لو كانت Completed ما نرجع نغيرها
+            if originalTask.status == "Not Started" {
+
+                originalTask.status =
+                    "In Progress"
+
+                try modelContext.save()
+
+                print(
+                    "Task marked In Progress: \(originalTask.title)"
+                )
+            }
+
+        } catch {
+
+            print(
+                "Failed to mark task In Progress: \(error)"
+            )
         }
     }
 

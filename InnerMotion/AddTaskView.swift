@@ -9,72 +9,101 @@ import SwiftUI
 import SwiftData
 
 struct AddTaskView: View {
+
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
 
-    // للتحكم بالكيبورد
+    // MARK: - Planning Session
+
+    // كل مرة نفتح AddTaskView من الهوم بدون تمرير ID
+    // تبدأ جلسة جديدة تلقائيًا.
+    // وإذا جينا من Add Another Task نمرر نفس الـ ID.
+    @State private var sessionID: UUID
+
+    init(sessionID: UUID? = nil) {
+        _sessionID = State(
+            initialValue: sessionID ?? UUID()
+        )
+    }
+    // MARK: - Keyboard
+
     @FocusState private var isTaskFieldFocused: Bool
 
-    // حالة التحكم بالانتقال إلى MyTasksView
+    // MARK: - Navigation
+
     @State private var navigateToMyTasks = false
 
-    // حالات حفظ البيانات المدخلة من الواجهة
+    // MARK: - User Input
+
     @State private var taskDescription: String = ""
     @State private var selectedPriority: TaskPriority? = nil
     @State private var dueDate: Date? = nil
+
     @State private var showDatePicker = false
     @State private var tempDate: Date = Date()
 
-    // الألوان
+    // MARK: - Colors
+
     private let primary = Color(
         red: 0.216,
         green: 0.0,
         blue: 0.541
-    ) // 37008A
+    )
 
     private let secondary = Color(
         red: 0.337,
         green: 0.239,
         blue: 0.416
-    ) // 563D6A
+    )
 
     private let buttonColor = Color(
         red: 0.459,
         green: 0.376,
         blue: 0.557
-    ) // 75608E
+    )
 
     private let pageBackground = Color(
         red: 0.996,
         green: 0.969,
         blue: 0.945
-    ) // FEF7F1
+    )
 
-    private let fieldBackground = Color.black.opacity(0.04)
+    private let fieldBackground =
+        Color.black.opacity(0.04)
 
     private let selectedBackground = Color(
         red: 0.910,
         green: 0.867,
         blue: 0.965
-    ) // E8DDF6
+    )
 
     private var dateFormatter: DateFormatter {
+
         let formatter = DateFormatter()
+
         formatter.dateFormat = "d MMM yyyy"
+
         return formatter
     }
 
     var body: some View {
+
         ZStack {
 
             pageBackground
                 .ignoresSafeArea()
 
-            // الانتقال إلى MyTasksView بعد حفظ المهمة
+            // MARK: - Navigate To My Tasks
+
             NavigationLink(
-                destination: MyTasksView(),
-                isActive: $navigateToMyTasks
+                destination:
+                    MyTasksView(
+                        sessionID: sessionID
+                    ),
+                isActive:
+                    $navigateToMyTasks
             ) {
+
                 EmptyView()
             }
 
@@ -83,18 +112,25 @@ struct AddTaskView: View {
                 // MARK: - Back Button
 
                 HStack {
-                    Button(action: {
+
+                    Button {
+
                         isTaskFieldFocused = false
+
                         dismiss()
-                    }) {
-                        Image(systemName: "chevron.left")
-                            .font(
-                                .system(
-                                    size: 20,
-                                    weight: .semibold
-                                )
+
+                    } label: {
+
+                        Image(
+                            systemName: "chevron.left"
+                        )
+                        .font(
+                            .system(
+                                size: 20,
+                                weight: .semibold
                             )
-                            .foregroundStyle(primary)
+                        )
+                        .foregroundStyle(primary)
                     }
 
                     Spacer()
@@ -104,14 +140,17 @@ struct AddTaskView: View {
 
                 // MARK: - Content
 
-                ScrollView(showsIndicators: false) {
+                ScrollView(
+                    showsIndicators: false
+                ) {
 
                     VStack(
                         alignment: .leading,
                         spacing: 0
                     ) {
 
-                        // Title
+                        // MARK: Title
+
                         VStack(spacing: 6) {
 
                             Text("Add your task")
@@ -123,14 +162,18 @@ struct AddTaskView: View {
                                 )
                                 .foregroundStyle(primary)
 
-                            Text("add one task pair time")
-                                .font(.system(size: 16))
-                                .foregroundStyle(secondary)
+                            Text(
+                                "add one task pair time"
+                            )
+                            .font(.system(size: 16))
+                            .foregroundStyle(secondary)
                         }
-                        .frame(maxWidth: .infinity)
+                        .frame(
+                            maxWidth: .infinity
+                        )
                         .padding(.top, 8)
 
-                        // MARK: - Task Description
+                        // MARK: Task Description
 
                         Text("Task Description")
                             .font(
@@ -142,32 +185,61 @@ struct AddTaskView: View {
                             .foregroundStyle(primary)
                             .padding(.top, 32)
 
-                        ZStack(alignment: .topLeading) {
+                        ZStack(
+                            alignment: .topLeading
+                        ) {
 
                             if taskDescription.isEmpty {
 
-                                Text("add your task here...")
-                                    .font(.system(size: 16))
-                                    .foregroundStyle(
-                                        secondary.opacity(0.6)
+                                Text(
+                                    "add your task here..."
+                                )
+                                .font(.system(size: 16))
+                                .foregroundStyle(
+                                    secondary.opacity(
+                                        0.6
                                     )
-                                    .padding(.horizontal, 18)
-                                    .padding(.vertical, 18)
-                                    .allowsHitTesting(false)
+                                )
+                                .padding(
+                                    .horizontal,
+                                    18
+                                )
+                                .padding(
+                                    .vertical,
+                                    18
+                                )
+                                .allowsHitTesting(
+                                    false
+                                )
                             }
 
                             TextEditor(
-                                text: $taskDescription
+                                text:
+                                    $taskDescription
                             )
-                            .font(.system(size: 16))
+                            .font(
+                                .system(size: 16)
+                            )
                             .foregroundStyle(primary)
-                            .scrollContentBackground(.hidden)
-                            .padding(.horizontal, 14)
-                            .padding(.vertical, 10)
-                            .focused($isTaskFieldFocused)
+                            .scrollContentBackground(
+                                .hidden
+                            )
+                            .padding(
+                                .horizontal,
+                                14
+                            )
+                            .padding(
+                                .vertical,
+                                10
+                            )
+                            .focused(
+                                $isTaskFieldFocused
+                            )
                         }
                         .frame(height: 110)
-                        .background(fieldBackground)
+                        .background(
+                            fieldBackground
+                        )
                         .clipShape(
                             RoundedRectangle(
                                 cornerRadius: 18
@@ -194,33 +266,43 @@ struct AddTaskView: View {
                                 id: \.self
                             ) { priority in
 
-                                Button(action: {
+                                Button {
 
-                                    isTaskFieldFocused = false
-                                    selectedPriority = priority
+                                    isTaskFieldFocused =
+                                        false
 
-                                }) {
+                                    selectedPriority =
+                                        priority
+
+                                } label: {
 
                                     HStack(spacing: 6) {
 
                                         Circle()
                                             .fill(
-                                                priority.dotColor
+                                                priority
+                                                    .dotColor
                                             )
                                             .frame(
                                                 width: 10,
                                                 height: 10
                                             )
 
-                                        Text(priority.rawValue)
-                                            .font(
-                                                .system(size: 15)
+                                        Text(
+                                            priority.rawValue
+                                        )
+                                        .font(
+                                            .system(
+                                                size: 15
                                             )
-                                            .foregroundStyle(
-                                                selectedPriority == priority
-                                                ? primary
-                                                : priority.dotColor
-                                            )
+                                        )
+                                        .foregroundStyle(
+                                            selectedPriority
+                                                == priority
+                                            ? primary
+                                            : priority
+                                                .dotColor
+                                        )
                                     }
                                     .padding(
                                         .horizontal,
@@ -231,13 +313,15 @@ struct AddTaskView: View {
                                         12
                                     )
                                     .background(
-                                        selectedPriority == priority
+                                        selectedPriority
+                                            == priority
                                         ? selectedBackground
                                         : fieldBackground
                                     )
                                     .clipShape(
                                         RoundedRectangle(
-                                            cornerRadius: 24
+                                            cornerRadius:
+                                                24
                                         )
                                     )
                                 }
@@ -248,49 +332,65 @@ struct AddTaskView: View {
 
                         // MARK: - Due Date
 
-                        Text("Due date (optional )")
-                            .font(
-                                .system(
-                                    size: 18,
-                                    weight: .medium
-                                )
+                        Text(
+                            "Due date (optional )"
+                        )
+                        .font(
+                            .system(
+                                size: 18,
+                                weight: .medium
                             )
-                            .foregroundStyle(primary)
-                            .padding(.top, 28)
+                        )
+                        .foregroundStyle(primary)
+                        .padding(.top, 28)
 
-                        Button(action: {
+                        Button {
 
-                            isTaskFieldFocused = false
+                            isTaskFieldFocused =
+                                false
+
                             showDatePicker = true
 
-                        }) {
+                        } label: {
 
                             HStack {
 
                                 Text(
                                     dueDate != nil
-                                    ? dateFormatter.string(
-                                        from: dueDate!
-                                    )
+                                    ? dateFormatter
+                                        .string(
+                                            from:
+                                                dueDate!
+                                        )
                                     : "Select a date"
                                 )
-                                .font(.system(size: 16))
+                                .font(
+                                    .system(size: 16)
+                                )
                                 .foregroundStyle(
                                     dueDate != nil
                                     ? primary
-                                    : secondary.opacity(0.7)
+                                    : secondary
+                                        .opacity(0.7)
                                 )
 
                                 Spacer()
 
                                 Image(
-                                    systemName: "calendar"
+                                    systemName:
+                                        "calendar"
                                 )
-                                .font(.system(size: 20))
-                                .foregroundStyle(primary)
+                                .font(
+                                    .system(size: 20)
+                                )
+                                .foregroundStyle(
+                                    primary
+                                )
                             }
                             .padding(18)
-                            .background(fieldBackground)
+                            .background(
+                                fieldBackground
+                            )
                             .clipShape(
                                 RoundedRectangle(
                                     cornerRadius: 18
@@ -300,26 +400,44 @@ struct AddTaskView: View {
                         .buttonStyle(.plain)
                         .padding(.top, 10)
                     }
-                    .padding(.horizontal, 24)
-                    .padding(.bottom, 24)
+                    .padding(
+                        .horizontal,
+                        24
+                    )
+                    .padding(
+                        .bottom,
+                        24
+                    )
                 }
-                .scrollDismissesKeyboard(.interactively)
+                .scrollDismissesKeyboard(
+                    .interactively
+                )
 
                 // MARK: - Add Task Button
 
-                Button(action: {
+                Button {
 
                     isTaskFieldFocused = false
+
                     saveTask()
 
-                }) {
+                } label: {
 
                     Text("Add the task")
-                        .font(Font.title3.bold())
+                        .font(
+                            Font.title3.bold()
+                        )
                         .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 18)
-                        .background(buttonColor)
+                        .frame(
+                            maxWidth: .infinity
+                        )
+                        .padding(
+                            .vertical,
+                            18
+                        )
+                        .background(
+                            buttonColor
+                        )
                         .clipShape(
                             RoundedRectangle(
                                 cornerRadius: 32
@@ -327,35 +445,49 @@ struct AddTaskView: View {
                         )
                 }
                 .buttonStyle(.plain)
-                .padding(.horizontal, 24)
-                .padding(.bottom, 24)
+                .padding(
+                    .horizontal,
+                    24
+                )
+                .padding(
+                    .bottom,
+                    24
+                )
             }
         }
+
         .navigationBarHidden(true)
 
         // MARK: - Date Picker
 
         .sheet(
-            isPresented: $showDatePicker
+            isPresented:
+                $showDatePicker
         ) {
 
             VStack {
 
                 DatePicker(
                     "Due date",
-                    selection: $tempDate,
-                    displayedComponents: .date
+                    selection:
+                        $tempDate,
+                    displayedComponents:
+                        .date
                 )
-                .datePickerStyle(.graphical)
+                .datePickerStyle(
+                    .graphical
+                )
                 .tint(buttonColor)
                 .padding()
 
-                Button(action: {
+                Button {
 
                     dueDate = tempDate
-                    showDatePicker = false
 
-                }) {
+                    showDatePicker =
+                        false
+
+                } label: {
 
                     Text("Done")
                         .font(
@@ -364,10 +496,19 @@ struct AddTaskView: View {
                                 weight: .semibold
                             )
                         )
-                        .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 14)
-                        .background(buttonColor)
+                        .foregroundStyle(
+                            .white
+                        )
+                        .frame(
+                            maxWidth: .infinity
+                        )
+                        .padding(
+                            .vertical,
+                            14
+                        )
+                        .background(
+                            buttonColor
+                        )
                         .clipShape(
                             RoundedRectangle(
                                 cornerRadius: 24
@@ -375,45 +516,74 @@ struct AddTaskView: View {
                         )
                 }
                 .buttonStyle(.plain)
-                .padding(.horizontal)
-                .padding(.bottom, 24)
+                .padding(
+                    .horizontal
+                )
+                .padding(
+                    .bottom,
+                    24
+                )
             }
-            .presentationDetents([.medium])
+            .presentationDetents(
+                [.medium]
+            )
         }
     }
 
-    // MARK: - Save Task to SwiftData
+    // MARK: - Save Task To SwiftData
 
     private func saveTask() {
 
         let cleanTitle =
-            taskDescription.trimmingCharacters(
-                in: .whitespacesAndNewlines
-            )
+            taskDescription
+                .trimmingCharacters(
+                    in:
+                        .whitespacesAndNewlines
+                )
 
-        guard !cleanTitle.isEmpty,
-              let selectedPriority = selectedPriority
+        guard
+            !cleanTitle.isEmpty,
+            let selectedPriority
         else {
             return
         }
 
         let newTask = UserTask(
-            title: cleanTitle,
-            priority: selectedPriority.rawValue,
-            dueDate: dueDate
+
+            title:
+                cleanTitle,
+
+            priority:
+                selectedPriority.rawValue,
+
+            dueDate:
+                dueDate,
+
+            status:
+                "Not Started",
+
+            planningSessionID:
+                sessionID,
+
+            // لسه ما خلص AI منها
+            isPlanned:
+                false
         )
 
-        modelContext.insert(newTask)
+        modelContext.insert(
+            newTask
+        )
 
         do {
 
             try modelContext.save()
 
             print(
-                "Task saved to SwiftData: \(cleanTitle)"
+                "Task saved to session \(sessionID): \(cleanTitle)"
             )
 
-            navigateToMyTasks = true
+            navigateToMyTasks =
+                true
 
         } catch {
 
@@ -424,12 +594,18 @@ struct AddTaskView: View {
     }
 }
 
+
+// MARK: - Preview
+
 #Preview {
+
     NavigationStack {
+
         AddTaskView()
     }
     .modelContainer(
-        for: UserTask.self,
+        for:
+            UserTask.self,
         inMemory: true
     )
 }

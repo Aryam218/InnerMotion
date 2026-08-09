@@ -7,13 +7,16 @@ import SwiftUI
 import SwiftData
 
 enum TaskEnergyLevel: String, CaseIterable {
+
     case high = "High"
     case medium = "Medium"
     case low = "Low"
     case veryLow = "Very low"
 
     var iconName: String {
+
         switch self {
+
         case .high, .medium:
             return "face.smiling"
 
@@ -23,8 +26,11 @@ enum TaskEnergyLevel: String, CaseIterable {
     }
 
     var highlightColor: Color {
+
         switch self {
+
         case .high:
+
             return Color(
                 red: 0.796,
                 green: 0.835,
@@ -32,6 +38,7 @@ enum TaskEnergyLevel: String, CaseIterable {
             )
 
         case .medium:
+
             return Color(
                 red: 0.973,
                 green: 0.953,
@@ -39,6 +46,7 @@ enum TaskEnergyLevel: String, CaseIterable {
             )
 
         case .low:
+
             return Color(
                 red: 0.969,
                 green: 0.827,
@@ -46,6 +54,7 @@ enum TaskEnergyLevel: String, CaseIterable {
             )
 
         case .veryLow:
+
             return Color(
                 red: 1.0,
                 green: 0.804,
@@ -55,14 +64,18 @@ enum TaskEnergyLevel: String, CaseIterable {
     }
 }
 
+
 enum TimeOption: Equatable {
+
     case fifteenMin
     case thirtyMin
     case oneHour
     case more(minutes: Int?)
 
     var label: String {
+
         switch self {
+
         case .fifteenMin:
             return "15 minutes"
 
@@ -73,6 +86,7 @@ enum TimeOption: Equatable {
             return "1 hour"
 
         case .more(let minutes):
+
             if let minutes {
                 return "\(minutes) minutes"
             }
@@ -82,7 +96,9 @@ enum TimeOption: Equatable {
     }
 
     var baseCase: Int {
+
         switch self {
+
         case .fifteenMin:
             return 0
 
@@ -98,7 +114,9 @@ enum TimeOption: Equatable {
     }
 
     var minutes: Int? {
+
         switch self {
+
         case .fifteenMin:
             return 15
 
@@ -114,10 +132,17 @@ enum TimeOption: Equatable {
     }
 }
 
+
 struct PlanYourDayView: View {
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
+
+    // MARK: - Current Planning Session
+
+    let sessionID: UUID
+
+    // MARK: - Selections
 
     @State private var selectedEnergy: TaskEnergyLevel? = nil
     @State private var selectedTime: TimeOption? = nil
@@ -127,13 +152,16 @@ struct PlanYourDayView: View {
     @State private var showCustomTimePicker = false
     @State private var customMinutes: Int = 45
 
-    // للتنقل بعد الحفظ
+    // بعد الحفظ يروح للـ Loading
     @State private var navigateToLoading = false
 
     private var isFormComplete: Bool {
+
         selectedEnergy != nil &&
         selectedTime != nil
     }
+
+    // MARK: - Colors
 
     private let primary = Color(
         red: 0.216,
@@ -201,11 +229,17 @@ struct PlanYourDayView: View {
             pageBackground
                 .ignoresSafeArea()
 
-            // التنقل إلى LoadingPlanView بعد الحفظ
+            // MARK: - Loading Navigation
+
             NavigationLink(
-                destination: LoadingPlanView(),
-                isActive: $navigateToLoading
+                destination:
+                    LoadingPlanView(
+                        sessionID: sessionID
+                    ),
+                isActive:
+                    $navigateToLoading
             ) {
+
                 EmptyView()
             }
 
@@ -216,9 +250,11 @@ struct PlanYourDayView: View {
                 HStack {
 
                     // Back
-                    Button(action: {
+                    Button {
+
                         dismiss()
-                    }) {
+
+                    } label: {
 
                         Image(
                             systemName: "chevron.left"
@@ -236,7 +272,9 @@ struct PlanYourDayView: View {
 
                     // Home
                     NavigationLink {
+
                         MainTabView()
+
                     } label: {
 
                         Image(
@@ -254,13 +292,16 @@ struct PlanYourDayView: View {
                         )
                     }
                     .simultaneousGesture(
+
                         DragGesture(
                             minimumDistance: 0
                         )
                         .onChanged { _ in
+
                             isHomePressed = true
                         }
                         .onEnded { _ in
+
                             isHomePressed = false
                         }
                     )
@@ -277,7 +318,8 @@ struct PlanYourDayView: View {
                         spacing: 0
                     ) {
 
-                        // Title
+                        // MARK: Title
+
                         VStack(spacing: 6) {
 
                             Text(
@@ -328,11 +370,12 @@ struct PlanYourDayView: View {
                                 id: \.self
                             ) { level in
 
-                                Button(action: {
+                                Button {
 
-                                    selectedEnergy = level
+                                    selectedEnergy =
+                                        level
 
-                                }) {
+                                } label: {
 
                                     VStack(spacing: 10) {
 
@@ -367,7 +410,9 @@ struct PlanYourDayView: View {
                                         .font(
                                             .system(size: 14)
                                         )
-                                        .foregroundStyle(primary)
+                                        .foregroundStyle(
+                                            primary
+                                        )
                                     }
                                 }
                                 .buttonStyle(.plain)
@@ -404,18 +449,20 @@ struct PlanYourDayView: View {
                                 id: \.offset
                             ) { _, option in
 
-                                Button(action: {
+                                Button {
 
                                     if case .more = option {
 
-                                        showCustomTimePicker = true
+                                        showCustomTimePicker =
+                                            true
 
                                     } else {
 
-                                        selectedTime = option
+                                        selectedTime =
+                                            option
                                     }
 
-                                }) {
+                                } label: {
 
                                     Text(
                                         displayLabel(
@@ -458,45 +505,58 @@ struct PlanYourDayView: View {
 
                 // MARK: - Create My Plan
 
-                Button(action: {
+                Button {
 
                     saveDayPlan()
 
-                }) {
+                } label: {
 
-                    Text("Create My Plan")
-                        .font(
-                            .system(
-                                size: 19,
-                                weight: .bold
-                            )
+                    Text(
+                        "Create My Plan"
+                    )
+                    .font(
+                        .system(
+                            size: 19,
+                            weight: .bold
                         )
-                        .foregroundStyle(.white)
-                        .frame(
-                            maxWidth: .infinity
+                    )
+                    .foregroundStyle(.white)
+                    .frame(
+                        maxWidth: .infinity
+                    )
+                    .padding(
+                        .vertical,
+                        20
+                    )
+                    .background(
+                        buttonColor
+                    )
+                    .clipShape(
+                        RoundedRectangle(
+                            cornerRadius: 32
                         )
-                        .padding(
-                            .vertical,
-                            20
-                        )
-                        .background(buttonColor)
-                        .clipShape(
-                            RoundedRectangle(
-                                cornerRadius: 32
-                            )
-                        )
+                    )
                 }
                 .buttonStyle(.plain)
-                .disabled(!isFormComplete)
+                .disabled(
+                    !isFormComplete
+                )
                 .opacity(
                     isFormComplete
                     ? 1
                     : 0.55
                 )
-                .padding(.horizontal, 24)
-                .padding(.bottom, 24)
+                .padding(
+                    .horizontal,
+                    24
+                )
+                .padding(
+                    .bottom,
+                    24
+                )
             }
         }
+
         .navigationBarHidden(true)
 
         // MARK: - Custom Time Picker
@@ -520,7 +580,8 @@ struct PlanYourDayView: View {
 
                 Picker(
                     "Minutes",
-                    selection: $customMinutes
+                    selection:
+                        $customMinutes
                 ) {
 
                     ForEach(
@@ -542,7 +603,7 @@ struct PlanYourDayView: View {
                 }
                 .pickerStyle(.wheel)
 
-                Button(action: {
+                Button {
 
                     selectedTime =
                         .more(
@@ -550,9 +611,10 @@ struct PlanYourDayView: View {
                                 customMinutes
                         )
 
-                    showCustomTimePicker = false
+                    showCustomTimePicker =
+                        false
 
-                }) {
+                } label: {
 
                     Text("Done")
                         .font(
@@ -592,33 +654,43 @@ struct PlanYourDayView: View {
 
     private func saveDayPlan() {
 
-        guard let selectedEnergy,
-              let selectedTime,
-              let availableMinutes =
+        guard
+            let selectedEnergy,
+            let selectedTime,
+            let availableMinutes =
                 selectedTime.minutes
         else {
             return
         }
 
         let newPlan = DayPlan(
+
             energyLevel:
                 selectedEnergy.rawValue,
 
             availableMinutes:
-                availableMinutes
+                availableMinutes,
+
+            // أهم شيء:
+            // نفس Session المهام
+            planningSessionID:
+                sessionID
         )
 
-        modelContext.insert(newPlan)
+        modelContext.insert(
+            newPlan
+        )
 
         do {
 
             try modelContext.save()
 
             print(
-                "DayPlan saved: \(selectedEnergy.rawValue), \(availableMinutes) minutes"
+                "DayPlan saved for session \(sessionID): \(selectedEnergy.rawValue), \(availableMinutes) minutes"
             )
 
-            navigateToLoading = true
+            navigateToLoading =
+                true
 
         } catch {
 
@@ -629,9 +701,16 @@ struct PlanYourDayView: View {
     }
 }
 
+
+// MARK: - Preview
+
 #Preview {
+
     NavigationStack {
-        PlanYourDayView()
+
+        PlanYourDayView(
+            sessionID: UUID()
+        )
     }
     .modelContainer(
         for: [

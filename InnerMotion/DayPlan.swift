@@ -15,13 +15,19 @@ final class DayPlan {
     var availableMinutes: Int
     var createdAt: Date
 
+    // يربط اختيار الطاقة والوقت
+    // بنفس جلسة المهام الحالية
+    var planningSessionID: UUID?
+
     init(
         energyLevel: String,
         availableMinutes: Int,
-        createdAt: Date = Date()
+        createdAt: Date = Date(),
+        planningSessionID: UUID? = nil
     ) {
         self.energyLevel = energyLevel
         self.availableMinutes = availableMinutes
         self.createdAt = createdAt
+        self.planningSessionID = planningSessionID
     }
 }

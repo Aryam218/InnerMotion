@@ -21,20 +21,49 @@ struct LoadingPlanView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
 
-    // المهام الأصلية التي كتبها المستخدم
-    @Query private var userTasks: [UserTask]
+    // MARK: - Current Planning Session
 
-    // خطط اليوم المحفوظة
+    let sessionID: UUID
+
+    // كل المهام المحفوظة
+    @Query private var allUserTasks: [UserTask]
+
+    // كل خطط اليوم
     @Query(
         sort: \DayPlan.createdAt,
         order: .reverse
     )
-    private var dayPlans: [DayPlan]
+    private var allDayPlans: [DayPlan]
 
-    // الخطط المولدة سابقًا
+    // كل الخطط المولدة سابقًا
     @Query private var existingPlannedTasks: [PlannedTask]
 
+    // MARK: - Current Session Data
+
+    // فقط المهام التي أضافها المستخدم في هذه الجلسة
+    private var userTasks: [UserTask] {
+
+        allUserTasks
+            .filter {
+                $0.planningSessionID == sessionID
+            }
+            .sorted {
+                $0.createdAt < $1.createdAt
+            }
+    }
+
+    // فقط DayPlan الخاص بهذه الجلسة
+    private var currentDayPlan: DayPlan? {
+
+        allDayPlans.first {
+            $0.planningSessionID == sessionID
+        }
+    }
+
+    // MARK: - UI State
+
     @State private var visibleItemCount = 0
+
     @State private var progress: CGFloat = 0
 
     // الخطة الجديدة الناتجة من AI
@@ -42,13 +71,16 @@ struct LoadingPlanView: View {
 
     // التنقل
     @State private var goToSingleTask = false
+
     @State private var goToMultipleTasks = false
 
-    // يمنع تشغيل AI مرتين
+    // يمنع تشغيل AI أكثر من مرة
     @State private var hasStartedGenerating = false
 
-    // خطأ في حالة Foundation Model غير متاح
+    // رسالة الخطأ
     @State private var errorMessage: String? = nil
+
+    // MARK: - Loading Content
 
     private let checklistItems = [
         "Prioritizing them based on importance",
@@ -56,6 +88,8 @@ struct LoadingPlanView: View {
         "Breaking them into small, manageable steps",
         "Creating a plan tailored for you"
     ]
+
+    // MARK: - Colors
 
     private let primary = Color(
         red: 0.471,
@@ -96,7 +130,9 @@ struct LoadingPlanView: View {
                         HStack {
 
                             Button {
+
                                 dismiss()
+
                             } label: {
 
                                 Image(
@@ -108,13 +144,21 @@ struct LoadingPlanView: View {
                                         weight: .semibold
                                     )
                                 )
-                                .foregroundStyle(primary)
+                                .foregroundStyle(
+                                    primary
+                                )
                             }
 
                             Spacer()
                         }
-                        .padding(.horizontal, 24)
-                        .padding(.top, 16)
+                        .padding(
+                            .horizontal,
+                            24
+                        )
+                        .padding(
+                            .top,
+                            16
+                        )
 
                         // MARK: - Robot
 
@@ -129,7 +173,8 @@ struct LoadingPlanView: View {
 
                                 Circle()
                                     .fill(
-                                        Color.black.opacity(0.03)
+                                        Color.black
+                                            .opacity(0.03)
                                     )
                                     .frame(
                                         width: 210,
@@ -137,15 +182,22 @@ struct LoadingPlanView: View {
                                     )
                             )
 
-                        Text("Understanding your tasks....")
-                            .font(
-                                .system(
-                                    size: 20,
-                                    weight: .medium
-                                )
+                        Text(
+                            "Understanding your tasks...."
+                        )
+                        .font(
+                            .system(
+                                size: 20,
+                                weight: .medium
                             )
-                            .foregroundStyle(primary)
-                            .padding(.top, 28)
+                        )
+                        .foregroundStyle(
+                            primary
+                        )
+                        .padding(
+                            .top,
+                            28
+                        )
 
                         // MARK: - Checklist
 
@@ -156,7 +208,8 @@ struct LoadingPlanView: View {
 
                             ForEach(
                                 Array(
-                                    checklistItems.enumerated()
+                                    checklistItems
+                                        .enumerated()
                                 ),
                                 id: \.offset
                             ) { index, item in
@@ -178,7 +231,8 @@ struct LoadingPlanView: View {
                                             )
 
                                         Image(
-                                            systemName: "checkmark"
+                                            systemName:
+                                                "checkmark"
                                         )
                                         .font(
                                             .system(
@@ -186,14 +240,20 @@ struct LoadingPlanView: View {
                                                 weight: .bold
                                             )
                                         )
-                                        .foregroundStyle(primary)
+                                        .foregroundStyle(
+                                            primary
+                                        )
                                     }
 
                                     Text(item)
                                         .font(
-                                            .system(size: 16)
+                                            .system(
+                                                size: 16
+                                            )
                                         )
-                                        .foregroundStyle(primary)
+                                        .foregroundStyle(
+                                            primary
+                                        )
                                         .fixedSize(
                                             horizontal: false,
                                             vertical: true
@@ -202,20 +262,28 @@ struct LoadingPlanView: View {
                                     Spacer()
                                 }
                                 .opacity(
-                                    visibleItemCount > index
+                                    visibleItemCount
+                                        > index
                                     ? 1
                                     : 0
                                 )
                                 .offset(
                                     y:
-                                        visibleItemCount > index
+                                        visibleItemCount
+                                            > index
                                         ? 0
                                         : 8
                                 )
                             }
                         }
-                        .padding(.top, 36)
-                        .padding(.horizontal, 32)
+                        .padding(
+                            .top,
+                            36
+                        )
+                        .padding(
+                            .horizontal,
+                            32
+                        )
 
                         Spacer(
                             minLength: 40
@@ -223,7 +291,9 @@ struct LoadingPlanView: View {
 
                         // MARK: - Progress
 
-                        VStack(spacing: 14) {
+                        VStack(
+                            spacing: 14
+                        ) {
 
                             GeometryReader { geo in
 
@@ -235,10 +305,14 @@ struct LoadingPlanView: View {
                                         .fill(
                                             trackBackground
                                         )
-                                        .frame(height: 6)
+                                        .frame(
+                                            height: 6
+                                        )
 
                                     Capsule()
-                                        .fill(primary)
+                                        .fill(
+                                            primary
+                                        )
                                         .frame(
                                             width:
                                                 geo.size.width
@@ -247,33 +321,54 @@ struct LoadingPlanView: View {
                                         )
                                 }
                             }
-                            .frame(height: 6)
+                            .frame(
+                                height: 6
+                            )
 
                             if let errorMessage {
 
-                                Text(errorMessage)
-                                    .font(
-                                        .system(size: 13)
+                                Text(
+                                    errorMessage
+                                )
+                                .font(
+                                    .system(
+                                        size: 13
                                     )
-                                    .foregroundStyle(.red)
-                                    .multilineTextAlignment(
-                                        .center
-                                    )
+                                )
+                                .foregroundStyle(
+                                    .red
+                                )
+                                .multilineTextAlignment(
+                                    .center
+                                )
 
                             } else {
 
-                                Text("Preparing your plan...")
-                                    .font(
-                                        .system(size: 14)
+                                Text(
+                                    "Preparing your plan..."
+                                )
+                                .font(
+                                    .system(
+                                        size: 14
                                     )
-                                    .foregroundStyle(.gray)
+                                )
+                                .foregroundStyle(
+                                    .gray
+                                )
                             }
                         }
-                        .padding(.horizontal, 32)
-                        .padding(.bottom, 40)
+                        .padding(
+                            .horizontal,
+                            32
+                        )
+                        .padding(
+                            .bottom,
+                            40
+                        )
                     }
                     .frame(
-                        minHeight: screen.size.height
+                        minHeight:
+                            screen.size.height
                     )
                 }
             }
@@ -283,24 +378,29 @@ struct LoadingPlanView: View {
 
         .task {
 
-            guard !hasStartedGenerating else {
+            guard
+                !hasStartedGenerating
+            else {
                 return
             }
 
-            hasStartedGenerating = true
+            hasStartedGenerating =
+                true
 
             runVisualSequence()
 
             await generatePlan()
         }
 
-        // MARK: - Single Task
+        // MARK: - Single Task Navigation
 
         .navigationDestination(
-            isPresented: $goToSingleTask
+            isPresented:
+                $goToSingleTask
         ) {
 
-            if let task = generatedTasks.first {
+            if let task =
+                generatedTasks.first {
 
                 PlanOneTask(
                     task: task
@@ -308,40 +408,49 @@ struct LoadingPlanView: View {
             }
         }
 
-        // MARK: - Multiple Tasks
+        // MARK: - Multiple Tasks Navigation
 
         .navigationDestination(
-            isPresented: $goToMultipleTasks
+            isPresented:
+                $goToMultipleTasks
         ) {
 
             MultipleTaks(
-                tasks: generatedTasks
+                tasks:
+                    generatedTasks
             )
         }
 
-        .navigationBarHidden(true)
+        .navigationBarHidden(
+            true
+        )
     }
 
     // MARK: - Visual Loading Animation
 
     private func runVisualSequence() {
 
-        for index in 0..<checklistItems.count {
+        for index in
+            0..<checklistItems.count {
 
-            DispatchQueue.main.asyncAfter(
-                deadline:
-                    .now()
-                    + Double(index) * 0.6
-            ) {
-
-                withAnimation(
-                    .easeOut(duration: 0.4)
+            DispatchQueue.main
+                .asyncAfter(
+                    deadline:
+                        .now()
+                        + Double(index)
+                        * 0.6
                 ) {
 
-                    visibleItemCount =
-                        index + 1
+                    withAnimation(
+                        .easeOut(
+                            duration: 0.4
+                        )
+                    ) {
+
+                        visibleItemCount =
+                            index + 1
+                    }
                 }
-            }
         }
     }
 
@@ -350,42 +459,89 @@ struct LoadingPlanView: View {
     @MainActor
     private func generatePlan() async {
 
-        guard !userTasks.isEmpty else {
+        // فقط مهام الجلسة الحالية
+        guard
+            !userTasks.isEmpty
+        else {
 
             errorMessage =
-                "No tasks were found."
+                "No tasks were found for this planning session."
 
             return
         }
 
-        guard let currentDayPlan =
-                dayPlans.first
+        // فقط Energy + Time
+        // الخاصة بنفس الجلسة
+        guard
+            let currentDayPlan
         else {
 
             errorMessage =
-                "No day plan was found."
+                "No day plan was found for this planning session."
 
             return
         }
 
         do {
 
+            // MARK: - Generate With AI
+
             let result =
-                try await TaskPlanningService.shared
+                try await
+                TaskPlanningService
+                    .shared
                     .generatePlan(
-                        tasks: userTasks,
-                        dayPlan: currentDayPlan
+                        tasks:
+                            userTasks,
+
+                        dayPlan:
+                            currentDayPlan
                     )
 
-            // نمسح الخطة المولدة السابقة
-            // حتى ما تتكرر كل مرة
+            // كل UserTask
+            // لازم تنتج PlannedTask واحدة
+            guard
+                result.tasks.count
+                ==
+                userTasks.count
+            else {
+
+                errorMessage =
+                    "The generated plan does not match the original tasks."
+
+                return
+            }
+
+            // MARK: - Delete Previous Plan
+            // For Current Session Only
+
+            /*
+             مهم جدًا:
+
+             ما عاد نمسح كل PlannedTask
+             في التطبيق.
+
+             فقط نمسح الخطط القديمة
+             الخاصة بنفس sessionID الحالية.
+
+             الخطط القديمة لجلسات أخرى
+             تظل محفوظة.
+             */
+
             for plannedTask in
-                existingPlannedTasks {
+                existingPlannedTasks
+            where
+                plannedTask
+                    .planningSessionID
+                ==
+                sessionID {
 
                 modelContext.delete(
                     plannedTask
                 )
             }
+
+            // MARK: - Build New Planned Tasks
 
             var newPlannedTasks:
                 [PlannedTask] = []
@@ -393,27 +549,18 @@ struct LoadingPlanView: View {
             for (
                 taskIndex,
                 generatedTask
-            ) in result.tasks.enumerated() {
+            ) in
+                result.tasks
+                    .enumerated() {
 
-                // نحاول نلقى المهمة الأصلية
-                // عشان نحافظ على Priority و Due Date
+                // المهمة الأصلية
+                // المقابلة لرد AI
                 let originalTask =
-                    userTasks.first {
+                    userTasks[
+                        taskIndex
+                    ]
 
-                        $0.title
-                            .trimmingCharacters(
-                                in:
-                                    .whitespacesAndNewlines
-                            )
-                            .lowercased()
-                        ==
-                        generatedTask.title
-                            .trimmingCharacters(
-                                in:
-                                    .whitespacesAndNewlines
-                            )
-                            .lowercased()
-                    }
+                // MARK: - Build Steps
 
                 let generatedSteps =
                     generatedTask.steps
@@ -423,11 +570,14 @@ struct LoadingPlanView: View {
                             generatedStep in
 
                             TaskStep(
+
                                 order:
-                                    stepIndex + 1,
+                                    stepIndex
+                                    + 1,
 
                                 text:
-                                    generatedStep.text,
+                                    generatedStep
+                                        .text,
 
                                 estimatedMinutes:
                                     generatedStep
@@ -438,24 +588,36 @@ struct LoadingPlanView: View {
                             )
                         }
 
+                // MARK: - Build Planned Task
+
                 let plannedTask =
                     PlannedTask(
 
+                        // عنوان المستخدم الأصلي
                         title:
-                            generatedTask.title,
+                            originalTask
+                                .title,
 
+                        // Priority الأصلية
                         priority:
-                            originalTask?
-                                .priority
-                            ?? "Medium",
+                            originalTask
+                                .priority,
 
+                        // Due Date الأصلية
                         dueDate:
-                            originalTask?
+                            originalTask
                                 .dueDate,
 
+                        // ترتيب المهمة
                         order:
-                            taskIndex + 1,
+                            taskIndex
+                            + 1,
 
+                        // نفس جلسة التخطيط
+                        planningSessionID:
+                            sessionID,
+
+                        // خطوات AI
                         steps:
                             generatedSteps
                     )
@@ -464,54 +626,123 @@ struct LoadingPlanView: View {
                     plannedTask
                 )
 
-                newPlannedTasks.append(
-                    plannedTask
-                )
+                newPlannedTasks
+                    .append(
+                        plannedTask
+                    )
+            }
+
+            // MARK: - Save Generated Plan
+
+            /*
+             أول شيء نحفظ:
+
+             PlannedTask
+             +
+             TaskStep
+
+             لو الحفظ فشل،
+             ما نعتمد UserTask.
+             */
+
+            try modelContext.save()
+
+            // MARK: - Mark User Tasks As Planned
+
+            /*
+             AI خلص بنجاح
+             والخطة انحفظت فعليًا.
+
+             الآن فقط نغير:
+
+             isPlanned = true
+
+             وبالتالي تظهر المهمة
+             في TaskListView.
+             */
+
+            for userTask in
+                userTasks {
+
+                userTask.isPlanned =
+                    true
             }
 
             try modelContext.save()
 
-            generatedTasks =
-                newPlannedTasks.sorted {
-                    $0.order < $1.order
-                }
+            // MARK: - Store Generated Tasks
 
-            // يكمل الشريط بعد ما AI يخلص فعلًا
+            generatedTasks =
+                newPlannedTasks
+                    .sorted {
+
+                        $0.order
+                        <
+                        $1.order
+                    }
+
+            // MARK: - Finish Loading Animation
+
             withAnimation(
-                .easeInOut(duration: 0.8)
+                .easeInOut(
+                    duration: 0.8
+                )
             ) {
 
                 progress = 1.0
+
                 visibleItemCount =
-                    checklistItems.count
+                    checklistItems
+                        .count
             }
 
-            // ننتظر شوي فقط عشان الأنيميشن
+            // نخلي المستخدم يشوف
+            // اكتمال الشريط
             try? await Task.sleep(
                 for:
-                    .milliseconds(850)
+                    .milliseconds(
+                        850
+                    )
             )
 
             onComplete()
 
-            // القرار الحقيقي حسب عدد المهام
-            if generatedTasks.count == 1 {
+            // MARK: - Navigation Decision
 
-                goToSingleTask = true
+            /*
+             القرار يعتمد على
+             مهام هذه الجلسة فقط.
 
-            } else if generatedTasks.count > 1 {
+             1 Task
+             → PlanOneTask
 
-                goToMultipleTasks = true
+             > 1
+             → MultipleTaks
+             */
+
+            if userTasks.count == 1 {
+
+                goToSingleTask =
+                    true
+
+            } else if
+                userTasks.count > 1 {
+
+                goToMultipleTasks =
+                    true
             }
 
         } catch {
 
-            print(
-                "AI plan generation failed: \(error)"
-            )
+            print("========== AI ERROR ==========")
+            print("Error: \(error)")
+            print("Type: \(type(of: error))")
+            print("Description: \(error.localizedDescription)")
+            print("NSError: \(error as NSError)")
+            print("==============================")
 
             errorMessage =
-                error.localizedDescription
+                "We couldn’t create your plan right now. Please try again."
         }
     }
 }
@@ -523,7 +754,10 @@ struct LoadingPlanView: View {
 
     NavigationStack {
 
-        LoadingPlanView()
+        LoadingPlanView(
+            sessionID:
+                UUID()
+        )
     }
     .modelContainer(
         for: [

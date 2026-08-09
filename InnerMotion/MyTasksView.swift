@@ -11,15 +11,37 @@ struct MyTasksView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
 
+    // MARK: - Current Planning Session
+
+    let sessionID: UUID
+
+    // كل المهام المحفوظة تاريخيًا
     @Query(
         sort: \UserTask.createdAt,
         order: .reverse
     )
-    private var tasks: [UserTask]
+    private var allTasks: [UserTask]
 
-    @State private var isContinuePressed = false
-    @State private var isHomePressed = false
-    @State private var navigateHome = false
+    // فقط مهام الجلسة الحالية
+    private var tasks: [UserTask] {
+
+        allTasks.filter {
+
+            $0.planningSessionID ==
+                sessionID
+        }
+    }
+
+    @State private var isContinuePressed =
+        false
+
+    @State private var isHomePressed =
+        false
+
+    @State private var navigateHome =
+        false
+
+    // MARK: - Colors
 
     private let primary = Color(
         red: 0.216,
@@ -46,17 +68,23 @@ struct MyTasksView: View {
     )
 
     var body: some View {
+
         NavigationStack {
+
             ZStack {
 
                 pageBackground
                     .ignoresSafeArea()
 
-                // انتقال للهوم
+                // MARK: - Navigate Home
+
                 NavigationLink(
-                    destination: MainTabView(),
-                    isActive: $navigateHome
+                    destination:
+                        MainTabView(),
+                    isActive:
+                        $navigateHome
                 ) {
+
                     EmptyView()
                 }
 
@@ -68,16 +96,24 @@ struct MyTasksView: View {
 
                         // Back
                         Button {
+
                             dismiss()
+
                         } label: {
-                            Image(systemName: "chevron.left")
-                                .font(
-                                    .system(
-                                        size: 20,
-                                        weight: .semibold
-                                    )
+
+                            Image(
+                                systemName:
+                                    "chevron.left"
+                            )
+                            .font(
+                                .system(
+                                    size: 20,
+                                    weight: .semibold
                                 )
-                                .foregroundStyle(primary)
+                            )
+                            .foregroundStyle(
+                                primary
+                            )
                         }
                         .buttonStyle(.plain)
 
@@ -85,29 +121,53 @@ struct MyTasksView: View {
 
                         // Home
                         Button {
+
                             navigateHome = true
+
                         } label: {
-                            Image(systemName: "house.fill")
-                                .font(.system(size: 26))
-                                .foregroundStyle(
-                                    buttonColor.opacity(
-                                        isHomePressed ? 0.5 : 1.0
+
+                            Image(
+                                systemName:
+                                    "house.fill"
+                            )
+                            .font(
+                                .system(size: 26)
+                            )
+                            .foregroundStyle(
+                                buttonColor
+                                    .opacity(
+                                        isHomePressed
+                                        ? 0.5
+                                        : 1.0
                                     )
-                                )
+                            )
                         }
                         .buttonStyle(.plain)
                         .simultaneousGesture(
-                            DragGesture(minimumDistance: 0)
-                                .onChanged { _ in
-                                    isHomePressed = true
-                                }
-                                .onEnded { _ in
-                                    isHomePressed = false
-                                }
+
+                            DragGesture(
+                                minimumDistance: 0
+                            )
+                            .onChanged { _ in
+
+                                isHomePressed =
+                                    true
+                            }
+                            .onEnded { _ in
+
+                                isHomePressed =
+                                    false
+                            }
                         )
                     }
-                    .padding(.horizontal, 24)
-                    .padding(.top, 16)
+                    .padding(
+                        .horizontal,
+                        24
+                    )
+                    .padding(
+                        .top,
+                        16
+                    )
 
                     // MARK: - Title
 
@@ -120,49 +180,82 @@ struct MyTasksView: View {
                                     weight: .regular
                                 )
                             )
-                            .foregroundStyle(primary)
+                            .foregroundStyle(
+                                primary
+                            )
 
-                        Text("Your tasks list")
-                            .font(.system(size: 18))
-                            .foregroundStyle(secondary)
+                        Text(
+                            "Your tasks list"
+                        )
+                        .font(
+                            .system(size: 18)
+                        )
+                        .foregroundStyle(
+                            secondary
+                        )
                     }
                     .padding(.top, 8)
 
-                    // MARK: - Task List
+                    // MARK: - Current Session Tasks
 
                     ScrollView {
 
                         VStack(spacing: 16) {
 
-                            ForEach(tasks) { task in
+                            ForEach(
+                                tasks
+                            ) { task in
 
                                 SwipeToDeleteUserTaskCard(
                                     task: task
                                 ) {
-                                    deleteTask(task)
+
+                                    deleteTask(
+                                        task
+                                    )
                                 }
                             }
                         }
-                        .padding(.horizontal, 24)
-                        .padding(.top, 32)
+                        .padding(
+                            .horizontal,
+                            24
+                        )
+                        .padding(
+                            .top,
+                            32
+                        )
                     }
 
                     // MARK: - Buttons
 
                     VStack(spacing: 14) {
 
+                        // Continue
                         NavigationLink(
-                            destination: PlanYourDayView()
+                            destination:
+                                PlanYourDayView(
+                                    sessionID: sessionID
+                                )
                         ) {
+
                             Text("Continue")
-                                .font(Font.title3.bold())
+                                .font(
+                                    Font.title3
+                                        .bold()
+                                )
                                 .foregroundStyle(
                                     isContinuePressed
                                     ? buttonColor
                                     : .white
                                 )
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 18)
+                                .frame(
+                                    maxWidth:
+                                        .infinity
+                                )
+                                .padding(
+                                    .vertical,
+                                    18
+                                )
                                 .background(
                                     isContinuePressed
                                     ? Color.white
@@ -170,67 +263,124 @@ struct MyTasksView: View {
                                 )
                                 .clipShape(
                                     RoundedRectangle(
-                                        cornerRadius: 32
+                                        cornerRadius:
+                                            32
                                     )
                                 )
                         }
                         .buttonStyle(.plain)
+                        .disabled(
+                            tasks.isEmpty
+                        )
+                        .opacity(
+                            tasks.isEmpty
+                            ? 0.55
+                            : 1
+                        )
                         .simultaneousGesture(
-                            DragGesture(minimumDistance: 0)
-                                .onChanged { _ in
-                                    isContinuePressed = true
-                                }
-                                .onEnded { _ in
-                                    isContinuePressed = false
-                                }
+
+                            DragGesture(
+                                minimumDistance: 0
+                            )
+                            .onChanged { _ in
+
+                                isContinuePressed =
+                                    true
+                            }
+                            .onEnded { _ in
+
+                                isContinuePressed =
+                                    false
+                            }
                         )
 
+                        // MARK: Add Another Task
+                        //
+                        // مهم:
+                        // نمرر نفس sessionID.
+                        //
+                        // يعني المهمة الجديدة
+                        // تنتمي لنفس المجموعة الحالية.
+
                         NavigationLink(
-                            destination: AddTaskView()
+                            destination:
+                                AddTaskView(
+                                    sessionID:
+                                        sessionID
+                                )
                         ) {
-                            Text("Add another task")
-                                .font(Font.title3.bold())
-                                .foregroundStyle(.white)
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 18)
-                                .background(
-                                    Color(
-                                        red: 0.663,
-                                        green: 0.592,
-                                        blue: 0.741
-                                    )
+
+                            Text(
+                                "Add another task"
+                            )
+                            .font(
+                                Font.title3.bold()
+                            )
+                            .foregroundStyle(
+                                .white
+                            )
+                            .frame(
+                                maxWidth:
+                                    .infinity
+                            )
+                            .padding(
+                                .vertical,
+                                18
+                            )
+                            .background(
+                                Color(
+                                    red: 0.663,
+                                    green: 0.592,
+                                    blue: 0.741
                                 )
-                                .clipShape(
-                                    RoundedRectangle(
-                                        cornerRadius: 32
-                                    )
+                            )
+                            .clipShape(
+                                RoundedRectangle(
+                                    cornerRadius: 32
                                 )
+                            )
                         }
                         .buttonStyle(.plain)
                     }
-                    .padding(.horizontal, 24)
-                    .padding(.bottom, 40)
+                    .padding(
+                        .horizontal,
+                        24
+                    )
+                    .padding(
+                        .bottom,
+                        40
+                    )
                 }
             }
-            .navigationBarHidden(true)
+
+            .navigationBarHidden(
+                true
+            )
         }
     }
 
-    // MARK: - Delete from SwiftData
+    // MARK: - Delete Task
 
     private func deleteTask(
         _ task: UserTask
     ) {
 
         withAnimation(
-            .easeOut(duration: 0.25)
+            .easeOut(
+                duration: 0.25
+            )
         ) {
 
-            modelContext.delete(task)
+            modelContext.delete(
+                task
+            )
 
             do {
+
                 try modelContext.save()
+
             } catch {
+
                 print(
                     "Failed to delete task: \(error)"
                 )
@@ -239,17 +389,23 @@ struct MyTasksView: View {
     }
 }
 
+
 // MARK: - Swipeable Task Card
 
 private struct SwipeToDeleteUserTaskCard: View {
 
     let task: UserTask
+
     var onDelete: () -> Void
 
-    @State private var offset: CGFloat = 0
-    @State private var isSwipeOpen = false
+    @State private var offset:
+        CGFloat = 0
 
-    private let deleteButtonWidth: CGFloat = 90
+    @State private var isSwipeOpen =
+        false
+
+    private let deleteButtonWidth:
+        CGFloat = 90
 
     private let primary = Color(
         red: 0.216,
@@ -270,8 +426,11 @@ private struct SwipeToDeleteUserTaskCard: View {
     )
 
     private var priorityColor: Color {
+
         switch task.priority {
+
         case "High":
+
             return Color(
                 red: 0.918,
                 green: 0.522,
@@ -279,6 +438,7 @@ private struct SwipeToDeleteUserTaskCard: View {
             )
 
         case "Medium":
+
             return Color(
                 red: 0.812,
                 green: 0.659,
@@ -286,6 +446,7 @@ private struct SwipeToDeleteUserTaskCard: View {
             )
 
         case "Low":
+
             return Color(
                 red: 0.004,
                 green: 0.588,
@@ -293,18 +454,26 @@ private struct SwipeToDeleteUserTaskCard: View {
             )
 
         default:
+
             return .gray
         }
     }
 
-    private var formattedDueDate: String {
+    private var formattedDueDate:
+        String {
 
-        guard let dueDate = task.dueDate else {
+        guard let dueDate =
+                task.dueDate
+        else {
+
             return "No due date"
         }
 
-        let formatter = DateFormatter()
-        formatter.dateFormat = "d MMM yyyy"
+        let formatter =
+            DateFormatter()
+
+        formatter.dateFormat =
+            "d MMM yyyy"
 
         return formatter.string(
             from: dueDate
@@ -313,12 +482,16 @@ private struct SwipeToDeleteUserTaskCard: View {
 
     var body: some View {
 
-        ZStack(alignment: .leading) {
+        ZStack(
+            alignment: .leading
+        ) {
 
-            // Delete panel
+            // MARK: Delete Panel
 
             Button {
+
                 onDelete()
+
             } label: {
 
                 VStack {
@@ -327,7 +500,8 @@ private struct SwipeToDeleteUserTaskCard: View {
                         .font(
                             .system(
                                 size: 17,
-                                weight: .semibold
+                                weight:
+                                    .semibold
                             )
                         )
                         .foregroundStyle(
@@ -339,11 +513,14 @@ private struct SwipeToDeleteUserTaskCard: View {
                         )
                 }
                 .frame(
-                    width: deleteButtonWidth,
-                    height: 120
+                    width:
+                        deleteButtonWidth,
+                    height:
+                        120
                 )
                 .background(
-                    Color.black.opacity(0.04)
+                    Color.black
+                        .opacity(0.04)
                 )
                 .clipShape(
                     RoundedRectangle(
@@ -353,7 +530,7 @@ private struct SwipeToDeleteUserTaskCard: View {
             }
             .buttonStyle(.plain)
 
-            // Task Card
+            // MARK: - Task Card
 
             VStack(
                 alignment: .leading,
@@ -366,38 +543,57 @@ private struct SwipeToDeleteUserTaskCard: View {
                         .font(
                             .system(
                                 size: 18,
-                                weight: .semibold
+                                weight:
+                                    .semibold
                             )
                         )
-                        .foregroundStyle(primary)
+                        .foregroundStyle(
+                            primary
+                        )
 
                     Spacer()
 
                     NavigationLink(
-                        destination: EditTaskView(task: task)
+                        destination:
+                            EditTaskView(
+                                task: task
+                            )
                     ) {
+
                         Image(
-                            systemName: "pencil"
+                            systemName:
+                                "pencil"
                         )
-                        .font(.system(size: 16))
-                        .foregroundStyle(buttonColor)
+                        .font(
+                            .system(size: 16)
+                        )
+                        .foregroundStyle(
+                            buttonColor
+                        )
                     }
                 }
 
                 HStack(spacing: 6) {
 
                     Text(task.status)
-                        .font(.system(size: 14))
-                        .foregroundStyle(.gray)
+                        .font(
+                            .system(size: 14)
+                        )
+                        .foregroundStyle(
+                            .gray
+                        )
 
                     Text("•")
-                        .foregroundStyle(.gray)
+                        .foregroundStyle(
+                            .gray
+                        )
 
                     Text(task.priority)
                         .font(
                             .system(
                                 size: 14,
-                                weight: .semibold
+                                weight:
+                                    .semibold
                             )
                         )
                         .foregroundStyle(
@@ -405,21 +601,27 @@ private struct SwipeToDeleteUserTaskCard: View {
                         )
                 }
 
-                Text(formattedDueDate)
-                    .font(
-                        .system(
-                            size: 15,
-                            weight: .medium
-                        )
+                Text(
+                    formattedDueDate
+                )
+                .font(
+                    .system(
+                        size: 15,
+                        weight: .medium
                     )
-                    .foregroundStyle(primary)
+                )
+                .foregroundStyle(
+                    primary
+                )
             }
             .padding(20)
             .frame(
                 maxWidth: .infinity,
                 alignment: .leading
             )
-            .background(cardBackground)
+            .background(
+                cardBackground
+            )
             .clipShape(
                 RoundedRectangle(
                     cornerRadius: 20
@@ -428,12 +630,15 @@ private struct SwipeToDeleteUserTaskCard: View {
             .offset(x: offset)
 
             .gesture(
+
                 DragGesture()
 
                     .onChanged { value in
 
                         let translation =
-                            value.translation.width
+                            value
+                                .translation
+                                .width
 
                         if isSwipeOpen {
 
@@ -461,40 +666,53 @@ private struct SwipeToDeleteUserTaskCard: View {
                     .onEnded { value in
 
                         let translation =
-                            value.translation.width
+                            value
+                                .translation
+                                .width
 
                         withAnimation(
-                            .easeOut(duration: 0.25)
+                            .easeOut(
+                                duration:
+                                    0.25
+                            )
                         ) {
 
                             if isSwipeOpen {
 
-                                if translation < -20 {
+                                if translation
+                                    < -20 {
 
                                     offset = 0
-                                    isSwipeOpen = false
+
+                                    isSwipeOpen =
+                                        false
 
                                 } else {
 
                                     offset =
                                         deleteButtonWidth
 
-                                    isSwipeOpen = true
+                                    isSwipeOpen =
+                                        true
                                 }
 
                             } else {
 
-                                if translation > 20 {
+                                if translation
+                                    > 20 {
 
                                     offset =
                                         deleteButtonWidth
 
-                                    isSwipeOpen = true
+                                    isSwipeOpen =
+                                        true
 
                                 } else {
 
                                     offset = 0
-                                    isSwipeOpen = false
+
+                                    isSwipeOpen =
+                                        false
                                 }
                             }
                         }
@@ -504,12 +722,20 @@ private struct SwipeToDeleteUserTaskCard: View {
     }
 }
 
+
+// MARK: - Preview
+
 #Preview {
+
     NavigationStack {
-        MyTasksView()
+
+        MyTasksView(
+            sessionID: UUID()
+        )
     }
     .modelContainer(
-        for: UserTask.self,
+        for:
+            UserTask.self,
         inMemory: true
     )
 }
