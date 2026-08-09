@@ -351,13 +351,14 @@ struct HomeView: View {
         ) {
             SuggestionCategoryView()
         }
-        
+        /*
         // ربط زر Continue Task بصفحة PlanOneTask
         .navigationDestination(
             isPresented: $goToPlanOneTask
         ) {
             PlanOneTask()
         }
+         */
     }
 }
 

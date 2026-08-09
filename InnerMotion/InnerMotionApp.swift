@@ -14,7 +14,12 @@ struct InnerMotionApp: App {
         WindowGroup {
             ContentView()
         }
-        .modelContainer(for: UserTask.self)
+        .modelContainer(for: [
+            UserTask.self,
+            DayPlan.self,
+            PlannedTask.self,
+            TaskStep.self
+        ])
     }
 }
 
