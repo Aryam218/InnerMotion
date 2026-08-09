@@ -6,27 +6,57 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct AddTaskView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
+
+    // للتحكم بالكيبورد
+    @FocusState private var isTaskFieldFocused: Bool
 
     // حالة التحكم بالانتقال إلى MyTasksView
     @State private var navigateToMyTasks = false
 
-    // حالات حفظ البيانات المربعة من الواجهة
+    // حالات حفظ البيانات المدخلة من الواجهة
     @State private var taskDescription: String = ""
-    @State private var selectedPriority: TaskPriority? = nil // يربط مع Enum الموحد بالمرشح
+    @State private var selectedPriority: TaskPriority? = nil
     @State private var dueDate: Date? = nil
     @State private var showDatePicker = false
     @State private var tempDate: Date = Date()
 
-    // الألوان المستخرجة من تصميم مشروعك
-    private let primary = Color(red: 0.216, green: 0.0, blue: 0.541)     // 37008A
-    private let secondary = Color(red: 0.337, green: 0.239, blue: 0.416) // 563D6A
-    private let buttonColor = Color(red: 0.459, green: 0.376, blue: 0.557) // 75608E
-    private let pageBackground = Color(red: 0.996, green: 0.969, blue: 0.945) // FEF7F1
+    // الألوان
+    private let primary = Color(
+        red: 0.216,
+        green: 0.0,
+        blue: 0.541
+    ) // 37008A
+
+    private let secondary = Color(
+        red: 0.337,
+        green: 0.239,
+        blue: 0.416
+    ) // 563D6A
+
+    private let buttonColor = Color(
+        red: 0.459,
+        green: 0.376,
+        blue: 0.557
+    ) // 75608E
+
+    private let pageBackground = Color(
+        red: 0.996,
+        green: 0.969,
+        blue: 0.945
+    ) // FEF7F1
+
     private let fieldBackground = Color.black.opacity(0.04)
-    private let selectedBackground = Color(red: 0.910, green: 0.867, blue: 0.965) // E8DDF6
+
+    private let selectedBackground = Color(
+        red: 0.910,
+        green: 0.867,
+        blue: 0.965
+    ) // E8DDF6
 
     private var dateFormatter: DateFormatter {
         let formatter = DateFormatter()
@@ -36,38 +66,63 @@ struct AddTaskView: View {
 
     var body: some View {
         ZStack {
-            pageBackground.ignoresSafeArea()
 
-            // ربط مخفي ينتقل إلى MyTasksView عند تفعيل المتغير
-            NavigationLink(destination: MyTasksView(), isActive: $navigateToMyTasks) {
+            pageBackground
+                .ignoresSafeArea()
+
+            // الانتقال إلى MyTasksView بعد حفظ المهمة
+            NavigationLink(
+                destination: MyTasksView(),
+                isActive: $navigateToMyTasks
+            ) {
                 EmptyView()
             }
 
             VStack(spacing: 0) {
-                // Back button (زر الرجوع للهوم بيج)
+
+                // MARK: - Back Button
+
                 HStack {
                     Button(action: {
+                        isTaskFieldFocused = false
                         dismiss()
                     }) {
                         Image(systemName: "chevron.left")
-                            .font(.system(size: 20, weight: .semibold))
+                            .font(
+                                .system(
+                                    size: 20,
+                                    weight: .semibold
+                                )
+                            )
                             .foregroundStyle(primary)
                     }
+
                     Spacer()
                 }
                 .padding(.horizontal, 24)
                 .padding(.top, 16)
 
-                // Scrollable content
+                // MARK: - Content
+
                 ScrollView(showsIndicators: false) {
-                    VStack(alignment: .leading, spacing: 0) {
-                        
-                        // Title Section
+
+                    VStack(
+                        alignment: .leading,
+                        spacing: 0
+                    ) {
+
+                        // Title
                         VStack(spacing: 6) {
+
                             Text("Add your task")
-                                .font(.system(size: 34, weight: .regular))
+                                .font(
+                                    .system(
+                                        size: 34,
+                                        weight: .regular
+                                    )
+                                )
                                 .foregroundStyle(primary)
-                            
+
                             Text("add one task pair time")
                                 .font(.system(size: 16))
                                 .foregroundStyle(secondary)
@@ -75,137 +130,306 @@ struct AddTaskView: View {
                         .frame(maxWidth: .infinity)
                         .padding(.top, 8)
 
-                        // Task Description Input
+                        // MARK: - Task Description
+
                         Text("Task Description")
-                            .font(.system(size: 18, weight: .medium))
+                            .font(
+                                .system(
+                                    size: 18,
+                                    weight: .medium
+                                )
+                            )
                             .foregroundStyle(primary)
                             .padding(.top, 32)
 
                         ZStack(alignment: .topLeading) {
+
                             if taskDescription.isEmpty {
+
                                 Text("add your task here...")
                                     .font(.system(size: 16))
-                                    .foregroundStyle(secondary.opacity(0.6))
+                                    .foregroundStyle(
+                                        secondary.opacity(0.6)
+                                    )
                                     .padding(.horizontal, 18)
                                     .padding(.vertical, 18)
+                                    .allowsHitTesting(false)
                             }
-                            
-                            TextEditor(text: $taskDescription)
-                                .font(.system(size: 16))
-                                .foregroundStyle(primary)
-                                .scrollContentBackground(.hidden)
-                                .padding(.horizontal, 14)
-                                .padding(.vertical, 10)
+
+                            TextEditor(
+                                text: $taskDescription
+                            )
+                            .font(.system(size: 16))
+                            .foregroundStyle(primary)
+                            .scrollContentBackground(.hidden)
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 10)
+                            .focused($isTaskFieldFocused)
                         }
                         .frame(height: 110)
                         .background(fieldBackground)
-                        .clipShape(RoundedRectangle(cornerRadius: 18))
+                        .clipShape(
+                            RoundedRectangle(
+                                cornerRadius: 18
+                            )
+                        )
                         .padding(.top, 10)
 
-                        // Priority Selector
+                        // MARK: - Priority
+
                         Text("Priority")
-                            .font(.system(size: 18, weight: .medium))
+                            .font(
+                                .system(
+                                    size: 18,
+                                    weight: .medium
+                                )
+                            )
                             .foregroundStyle(primary)
                             .padding(.top, 28)
 
                         HStack(spacing: 10) {
-                            ForEach(TaskPriority.allCases, id: \.self) { priority in
+
+                            ForEach(
+                                TaskPriority.allCases,
+                                id: \.self
+                            ) { priority in
+
                                 Button(action: {
+
+                                    isTaskFieldFocused = false
                                     selectedPriority = priority
+
                                 }) {
+
                                     HStack(spacing: 6) {
+
                                         Circle()
-                                            .fill(priority.dotColor)
-                                            .frame(width: 10, height: 10)
-                                        
+                                            .fill(
+                                                priority.dotColor
+                                            )
+                                            .frame(
+                                                width: 10,
+                                                height: 10
+                                            )
+
                                         Text(priority.rawValue)
-                                            .font(.system(size: 15))
-                                            .foregroundStyle(selectedPriority == priority ? primary : priority.dotColor)
+                                            .font(
+                                                .system(size: 15)
+                                            )
+                                            .foregroundStyle(
+                                                selectedPriority == priority
+                                                ? primary
+                                                : priority.dotColor
+                                            )
                                     }
-                                    .padding(.horizontal, 18)
-                                    .padding(.vertical, 12)
-                                    .background(selectedPriority == priority ? selectedBackground : fieldBackground)
-                                    .clipShape(RoundedRectangle(cornerRadius: 24))
+                                    .padding(
+                                        .horizontal,
+                                        18
+                                    )
+                                    .padding(
+                                        .vertical,
+                                        12
+                                    )
+                                    .background(
+                                        selectedPriority == priority
+                                        ? selectedBackground
+                                        : fieldBackground
+                                    )
+                                    .clipShape(
+                                        RoundedRectangle(
+                                            cornerRadius: 24
+                                        )
+                                    )
                                 }
+                                .buttonStyle(.plain)
                             }
                         }
                         .padding(.top, 10)
 
-                        // Due Date Selector
+                        // MARK: - Due Date
+
                         Text("Due date (optional )")
-                            .font(.system(size: 18, weight: .medium))
+                            .font(
+                                .system(
+                                    size: 18,
+                                    weight: .medium
+                                )
+                            )
                             .foregroundStyle(primary)
                             .padding(.top, 28)
 
                         Button(action: {
+
+                            isTaskFieldFocused = false
                             showDatePicker = true
+
                         }) {
+
                             HStack {
-                                Text(dueDate != nil ? dateFormatter.string(from: dueDate!) : "Select a date")
-                                    .font(.system(size: 16))
-                                    .foregroundStyle(dueDate != nil ? primary : secondary.opacity(0.7))
-                                
+
+                                Text(
+                                    dueDate != nil
+                                    ? dateFormatter.string(
+                                        from: dueDate!
+                                    )
+                                    : "Select a date"
+                                )
+                                .font(.system(size: 16))
+                                .foregroundStyle(
+                                    dueDate != nil
+                                    ? primary
+                                    : secondary.opacity(0.7)
+                                )
+
                                 Spacer()
-                                
-                                Image(systemName: "calendar")
-                                    .font(.system(size: 20))
-                                    .foregroundStyle(primary)
+
+                                Image(
+                                    systemName: "calendar"
+                                )
+                                .font(.system(size: 20))
+                                .foregroundStyle(primary)
                             }
                             .padding(18)
                             .background(fieldBackground)
-                            .clipShape(RoundedRectangle(cornerRadius: 18))
+                            .clipShape(
+                                RoundedRectangle(
+                                    cornerRadius: 18
+                                )
+                            )
                         }
+                        .buttonStyle(.plain)
                         .padding(.top, 10)
                     }
                     .padding(.horizontal, 24)
                     .padding(.bottom, 24)
                 }
+                .scrollDismissesKeyboard(.interactively)
 
-                // Add Task Button (Pinned at bottom)
+                // MARK: - Add Task Button
+
                 Button(action: {
-                    print("Task Added: \(taskDescription)")
-                    navigateToMyTasks = true
+
+                    isTaskFieldFocused = false
+                    saveTask()
+
                 }) {
+
                     Text("Add the task")
                         .font(Font.title3.bold())
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 18)
                         .background(buttonColor)
-                        .clipShape(RoundedRectangle(cornerRadius: 32))
+                        .clipShape(
+                            RoundedRectangle(
+                                cornerRadius: 32
+                            )
+                        )
                 }
+                .buttonStyle(.plain)
                 .padding(.horizontal, 24)
                 .padding(.bottom, 24)
             }
         }
         .navigationBarHidden(true)
-        .sheet(isPresented: $showDatePicker) {
+
+        // MARK: - Date Picker
+
+        .sheet(
+            isPresented: $showDatePicker
+        ) {
+
             VStack {
-                DatePicker("Due date", selection: $tempDate, displayedComponents: .date)
-                    .datePickerStyle(.graphical)
-                    .tint(buttonColor)
-                    .padding()
+
+                DatePicker(
+                    "Due date",
+                    selection: $tempDate,
+                    displayedComponents: .date
+                )
+                .datePickerStyle(.graphical)
+                .tint(buttonColor)
+                .padding()
 
                 Button(action: {
+
                     dueDate = tempDate
                     showDatePicker = false
+
                 }) {
+
                     Text("Done")
-                        .font(.system(size: 16, weight: .semibold))
+                        .font(
+                            .system(
+                                size: 16,
+                                weight: .semibold
+                            )
+                        )
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 14)
                         .background(buttonColor)
-                        .clipShape(RoundedRectangle(cornerRadius: 24))
+                        .clipShape(
+                            RoundedRectangle(
+                                cornerRadius: 24
+                            )
+                        )
                 }
+                .buttonStyle(.plain)
                 .padding(.horizontal)
                 .padding(.bottom, 24)
             }
             .presentationDetents([.medium])
         }
     }
+
+    // MARK: - Save Task to SwiftData
+
+    private func saveTask() {
+
+        let cleanTitle =
+            taskDescription.trimmingCharacters(
+                in: .whitespacesAndNewlines
+            )
+
+        guard !cleanTitle.isEmpty,
+              let selectedPriority = selectedPriority
+        else {
+            return
+        }
+
+        let newTask = UserTask(
+            title: cleanTitle,
+            priority: selectedPriority.rawValue,
+            dueDate: dueDate
+        )
+
+        modelContext.insert(newTask)
+
+        do {
+
+            try modelContext.save()
+
+            print(
+                "Task saved to SwiftData: \(cleanTitle)"
+            )
+
+            navigateToMyTasks = true
+
+        } catch {
+
+            print(
+                "Failed to save task: \(error)"
+            )
+        }
+    }
 }
 
 #Preview {
-    AddTaskView()
+    NavigationStack {
+        AddTaskView()
+    }
+    .modelContainer(
+        for: UserTask.self,
+        inMemory: true
+    )
 }
