@@ -11,6 +11,7 @@ struct FeedbackView: View {
 
     @Environment(\.dismiss) private var dismiss
     @State private var selectedFeedback: FeedbackOption?
+    @State private var goToHome = false
 
     var body: some View {
         ZStack {
@@ -19,7 +20,7 @@ struct FeedbackView: View {
 
             VStack(spacing: 0) {
 
-                // MARK: - Back and Home
+                // MARK: - Back
 
                 HStack {
                     Button {
@@ -34,17 +35,6 @@ struct FeedbackView: View {
                     .buttonStyle(.plain)
 
                     Spacer()
-
-                    NavigationLink {
-                        MainTabView()
-                    } label: {
-                        Image(systemName: "house")
-                            .font(.system(size: 27, weight: .semibold))
-                            .foregroundStyle(Color(hex: "75608E"))
-                            .frame(width: 38, height: 38)
-                            .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
                 }
                 .padding(.horizontal, 24)
                 .padding(.top, 6)
@@ -80,6 +70,9 @@ struct FeedbackView: View {
             }
         }
         .toolbar(.hidden, for: .navigationBar)
+        .navigationDestination(isPresented: $goToHome) {
+            MainTabView()
+        }
     }
 
     // MARK: - Feedback Card
@@ -92,6 +85,12 @@ struct FeedbackView: View {
 
         return Button {
             selectedFeedback = option
+
+            // بعد ما تختارين تقييم، نرجع تلقائيًا للهوم بعد ثانيتين
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                goToHome = true
+            }
+
         } label: {
             HStack(spacing: 16) {
 
@@ -306,4 +305,3 @@ enum FeedbackFaceType {
         FeedbackView()
     }
 }
-

@@ -17,6 +17,8 @@ struct LoadingPlanView: View {
     // handle back navigation
     var onComplete: () -> Void = {}
 
+    @Environment(\.dismiss) private var dismiss
+
     @State private var visibleItemCount = 0
     @State private var progress: CGFloat = 0
     @State private var goToPlanOneTask = false
@@ -40,6 +42,22 @@ struct LoadingPlanView: View {
             GeometryReader { screen in
                 ScrollView {
                     VStack(spacing: 0) {
+
+                        // Top Bar (زر الباك فقط، نفس تنسيق باقي الصفحات)
+                        HStack {
+                            Button {
+                                dismiss()
+                            } label: {
+                                Image(systemName: "chevron.left")
+                                    .font(.system(size: 20, weight: .semibold))
+                                    .foregroundStyle(primary)
+                            }
+
+                            Spacer()
+                        }
+                        .padding(.horizontal, 24)
+                        .padding(.top, 16)
+
                         // Robot illustration
                         // Add this PNG as a regular Image Set in Assets.xcassets named "robotIcon"
                         // (not the App Icon slot - that's reserved for the home screen icon).
@@ -117,6 +135,7 @@ struct LoadingPlanView: View {
         .navigationDestination(isPresented: $goToPlanOneTask) {
             PlanOneTask()
         }
+        .navigationBarHidden(true)
     }
 
     private func runSequence() {
