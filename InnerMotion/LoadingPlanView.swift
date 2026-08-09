@@ -19,6 +19,7 @@ struct LoadingPlanView: View {
 
     @State private var visibleItemCount = 0
     @State private var progress: CGFloat = 0
+    @State private var goToPlanOneTask = false
 
     private let checklistItems = [
         "Prioritizing them based on importance",
@@ -113,6 +114,9 @@ struct LoadingPlanView: View {
         .onAppear {
             runSequence()
         }
+        .navigationDestination(isPresented: $goToPlanOneTask) {
+            PlanOneTask()
+        }
     }
 
     private func runSequence() {
@@ -133,13 +137,18 @@ struct LoadingPlanView: View {
             }
         }
 
-        // Call onComplete once the whole sequence has finished
-        DispatchQueue.main.asyncAfter(deadline: .now() + allItemsRevealedDelay + 1.4) {
+        // لما يخلص الشريط تمامًا، ننتقل لصفحة PlanOneTask
+        // وبردو نستدعي onComplete() لو الصفحة اللي فوق تبي تسوي شي إضافي
+        let progressDoneDelay = allItemsRevealedDelay + 1.2
+        DispatchQueue.main.asyncAfter(deadline: .now() + progressDoneDelay) {
+            goToPlanOneTask = true
             onComplete()
         }
     }
 }
 
 #Preview {
-    LoadingPlanView()
+    NavigationStack {
+        LoadingPlanView()
+    }
 }

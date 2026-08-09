@@ -10,6 +10,7 @@ import SwiftUI
 struct HomeView: View {
     
     @State private var showSuggestionCategories = false
+    @State private var goToPlanOneTask = false
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -303,7 +304,9 @@ struct HomeView: View {
                                 Spacer(minLength: 0)
                             }
                             
-                            Button(action: {}) {
+                            Button(action: {
+                                goToPlanOneTask = true
+                            }) {
                                 HStack(spacing: 4) {
                                     Text("Continue Task")
                                         .font(.system(size: 12, weight: .medium))
@@ -348,10 +351,18 @@ struct HomeView: View {
         ) {
             SuggestionCategoryView()
         }
+        
+        // ربط زر Continue Task بصفحة PlanOneTask
+        .navigationDestination(
+            isPresented: $goToPlanOneTask
+        ) {
+            PlanOneTask()
+        }
     }
 }
 
 #Preview {
-    HomeView()
+    NavigationStack {
+        HomeView()
+    }
 }
-

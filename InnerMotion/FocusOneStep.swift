@@ -9,6 +9,7 @@ struct FocusOneStep: View {
 
     @State private var showCompletionPopup = false
     @State private var goToBreakTime = false
+    @State private var goToStarReward = false
 
     var body: some View {
 
@@ -44,8 +45,8 @@ struct FocusOneStep: View {
 
                     Spacer()
 
-                    Button {
-
+                    NavigationLink {
+                        MainTabView()
                     } label: {
                         Image(systemName: "house")
                             .font(.system(size: 28))
@@ -176,6 +177,7 @@ struct FocusOneStep: View {
 
                     Button {
                         showCompletionPopup = false
+                        goToStarReward = true
                     } label: {
                         Text("Continue")
                             .font(.system(size: 20, weight: .medium))
@@ -195,6 +197,9 @@ struct FocusOneStep: View {
         }
         .animation(.easeInOut(duration: 0.25), value: showCompletionPopup)
         .toolbar(.hidden, for: .navigationBar)
+        .navigationDestination(isPresented: $goToStarReward) {
+            StarRewardView()
+        }
     }
 }
 
@@ -211,5 +216,7 @@ struct RoundedCorner: Shape {
 
 
 #Preview {
-    FocusOneStep()
+    NavigationStack {
+        FocusOneStep()
+    }
 }
