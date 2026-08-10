@@ -18,7 +18,8 @@ struct InnerMotionApp: App {
             UserTask.self,
             DayPlan.self,
             PlannedTask.self,
-            TaskStep.self
+            TaskStep.self,
+            SuggestionActivity.self
         ])
     }
 }

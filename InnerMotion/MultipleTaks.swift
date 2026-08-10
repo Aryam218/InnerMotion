@@ -32,7 +32,7 @@ struct MultipleTaks: View {
 
     var body: some View {
 
-        NavigationStack {
+        
 
             ZStack {
 
@@ -157,7 +157,10 @@ struct MultipleTaks: View {
 
                 if let selectedTask {
                     PlanOneTask(
-                        task: selectedTask
+                        task: selectedTask,
+                        onBack: {
+                            goToSelectedTask = false
+                        }
                     )
                 }
             }
@@ -166,7 +169,7 @@ struct MultipleTaks: View {
                 .hidden,
                 for: .navigationBar
             )
-        }
+        
     }
 }
 
