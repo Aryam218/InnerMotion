@@ -17,6 +17,7 @@ struct SuggestionResultView: View {
     let selectedTime: AvailableTime?
     let selectedLocation: UserLocation?
 
+
     // MARK: - Environment
 
     @Environment(\.dismiss)
@@ -25,583 +26,636 @@ struct SuggestionResultView: View {
     @Environment(\.modelContext)
     private var modelContext
 
+
     // MARK: - Previous Feedback
 
-    // نستخدم التقييمات السابقة عشان الـ AI
-    // يعرف تفضيلات المستخدم مستقبلًا
     @Query(
         sort: \SuggestionActivity.createdAt,
         order: .reverse
     )
     private var suggestionHistory: [SuggestionActivity]
 
+
     // MARK: - AI Result
 
-    @State private var generatedSuggestion: GeneratedSuggestion?
+    @State private var generatedSuggestion:
+        GeneratedSuggestion?
+
 
     // MARK: - Previous Suggestions In Current Session
 
-    // الاقتراحات اللي ظهرت للمستخدم في نفس الجلسة
-    // عشان Another Idea ما يكررها
-    @State private var previousSuggestions: [String] = []
+    @State private var previousSuggestions:
+        [String] = []
+
 
     // MARK: - Loading / Error
 
-    @State private var isGenerating = false
-    @State private var errorMessage: String?
+    @State private var isGenerating =
+        false
+
+    @State private var errorMessage:
+        String?
+
 
     // MARK: - Navigation
 
-    @State private var goToFeedback = false
+    @State private var goToFeedback =
+        false
 
-    // النشاط الذي ضغط عليه المستخدم Start Activity
-    // نمرره لصفحة Feedback
-    @State private var startedActivity: SuggestionActivity?
+    @State private var startedActivity:
+        SuggestionActivity?
+
 
     // يمنع التوليد الأول من التشغيل أكثر من مرة
-    @State private var hasGeneratedInitialSuggestion = false
+    @State private var hasGeneratedInitialSuggestion =
+        false
+
 
     var body: some View {
 
-        ZStack {
+        ZStack(alignment: .top) {
+
+            // MARK: - Background
 
             Color(hex: "FFF7F1")
                 .ignoresSafeArea()
 
-            VStack(spacing: 0) {
 
-                // MARK: - Back and Home
+            // MARK: - Scrollable Content
 
-                HStack {
+            ScrollView(
+                .vertical,
+                showsIndicators: false
+            ) {
 
-                    Button {
+                VStack(spacing: 0) {
 
-                        dismiss()
-
-                    } label: {
-
-                        Image(
-                            systemName:
-                                "chevron.left"
-                        )
-                        .font(
-                            .system(
-                                size: 20,
-                                weight: .medium
-                            )
-                        )
-                        .foregroundStyle(
-                            Color(hex: "75608E")
-                        )
+                    // مساحة للهيدر الثابت
+                    Color.clear
                         .frame(
-                            width: 32,
-                            height: 32
+                            height: 58
                         )
-                        .contentShape(
-                            Rectangle()
-                        )
-                    }
-                    .buttonStyle(.plain)
 
-                    Spacer()
 
-                    NavigationLink {
+                    // MARK: - Title
 
-                        MainTabView()
-
-                    } label: {
-
-                        Image(
-                            systemName: "house"
-                        )
-                        .font(
-                            .system(
-                                size: 27,
-                                weight: .semibold
-                            )
-                        )
-                        .foregroundStyle(
-                            Color(hex: "75608E")
-                        )
-                        .frame(
-                            width: 38,
-                            height: 38
-                        )
-                        .contentShape(
-                            Rectangle()
-                        )
-                    }
-                    .buttonStyle(.plain)
-                }
-                .padding(
-                    .horizontal,
-                    24
-                )
-                .padding(
-                    .top,
-                    4
-                )
-
-                // MARK: - Title
-
-                Text(
-                    "A Suggestion for You!"
-                )
-                .font(
-                    .system(
-                        size: 34,
-                        weight: .regular
+                    Text(
+                        "A Suggestion for You!"
                     )
-                )
-                .foregroundStyle(
-                    Color(hex: "37008A")
-                )
-                .multilineTextAlignment(
-                    .center
-                )
-                .fixedSize(
-                    horizontal: false,
-                    vertical: true
-                )
-                .frame(
-                    maxWidth: .infinity
-                )
-                .padding(
-                    .top,
-                    34
-                )
-
-                // MARK: - Fixed Image
-
-                Image(
-                    "suggestionActivityImage"
-                )
-                .resizable()
-                .scaledToFill()
-                .frame(
-                    width: 220,
-                    height: 220
-                )
-                .clipShape(
-                    RoundedRectangle(
-                        cornerRadius: 12
+                    .font(
+                        .system(
+                            size: 34,
+                            weight: .regular
+                        )
                     )
-                )
-                .padding(
-                    .top,
-                    70
-                )
-
-                // MARK: - Suggestion Area
-
-                if isGenerating {
-
-                    // MARK: Loading
-
-                    VStack(spacing: 16) {
-
-                        ProgressView()
-                            .scaleEffect(1.2)
-                            .tint(
-                                Color(hex: "75608E")
-                            )
-
-                        Text(
-                            "Finding something for you..."
-                        )
-                        .font(
-                            .system(
-                                size: 16,
-                                weight: .regular
-                            )
-                        )
-                        .foregroundStyle(
-                            Color(hex: "563D6A")
-                        )
-                    }
+                    .foregroundStyle(
+                        Color(hex: "37008A")
+                    )
+                    .multilineTextAlignment(
+                        .center
+                    )
+                    .fixedSize(
+                        horizontal: false,
+                        vertical: true
+                    )
                     .frame(
-                        width: 300,
-                        height: 115
+                        maxWidth: .infinity
                     )
-                    .background(
+                    .padding(
+                        .top,
+                        24
+                    )
+
+
+                    // MARK: - Fixed Image
+
+                    Image(
+                        "suggestionActivityImage"
+                    )
+                    .resizable()
+                    .scaledToFill()
+                    .frame(
+                        width: 220,
+                        height: 220
+                    )
+                    .clipShape(
                         RoundedRectangle(
                             cornerRadius: 12
-                        )
-                        .fill(
-                            Color(hex: "F5F0F0")
                         )
                     )
                     .padding(
                         .top,
-                        50
+                        70
                     )
 
-                } else if let suggestion =
-                            generatedSuggestion {
 
-                    // MARK: AI Suggestion Card
+                    // MARK: - Suggestion Area
 
-                    VStack(spacing: 14) {
+                    Group {
 
-                        Text(
-                            suggestion.activity
-                        )
-                        .font(
-                            .system(
-                                size: 18,
-                                weight: .regular
-                            )
-                        )
-                        .foregroundStyle(
-                            Color(hex: "563D6A")
-                        )
-                        .multilineTextAlignment(
-                            .center
-                        )
-                        .lineSpacing(2)
-                        .fixedSize(
-                            horizontal: false,
-                            vertical: true
-                        )
+                        if isGenerating {
 
-                        HStack(
-                            spacing: 20
-                        ) {
+                            // MARK: Loading
 
-                            // MARK: Estimated Time
+                            VStack(spacing: 16) {
 
-                            HStack(spacing: 7) {
-
-                                Image(
-                                    systemName:
-                                        "clock"
-                                )
-                                .font(
-                                    .system(
-                                        size: 15,
-                                        weight: .medium
+                                ProgressView()
+                                    .scaleEffect(1.2)
+                                    .tint(
+                                        Color(hex: "75608E")
                                     )
-                                )
-                                .foregroundStyle(
-                                    Color(
-                                        hex:
-                                            "7049DD"
-                                    )
-                                )
+
 
                                 Text(
-                                    "\(suggestion.estimatedMinutes) min"
-                                )
-                                .font(
-                                    .system(
-                                        size: 14,
-                                        weight: .regular
-                                    )
-                                )
-                                .foregroundStyle(
-                                    Color(
-                                        hex:
-                                            "563D6A"
-                                    )
-                                )
-                            }
-                            .padding(
-                                .horizontal,
-                                12
-                            )
-                            .frame(
-                                height: 30
-                            )
-                            .background(
-                                Capsule()
-                                    .fill(
-                                        Color(
-                                            hex:
-                                                "EDEBEB"
-                                        )
-                                    )
-                            )
-
-                            // MARK: Difficulty
-
-                            HStack(spacing: 7) {
-
-                                Image(
-                                    systemName:
-                                        "chart.bar.fill"
-                                )
-                                .font(
-                                    .system(
-                                        size: 14,
-                                        weight: .medium
-                                    )
-                                )
-                                .foregroundStyle(
-                                    Color(
-                                        hex:
-                                            "7049DD"
-                                    )
-                                )
-
-                                Text(
-                                    suggestion.difficulty
-                                )
-                                .font(
-                                    .system(
-                                        size: 14,
-                                        weight: .regular
-                                    )
-                                )
-                                .foregroundStyle(
-                                    Color(
-                                        hex:
-                                            "563D6A"
-                                    )
-                                )
-                            }
-                            .padding(
-                                .horizontal,
-                                12
-                            )
-                            .frame(
-                                height: 30
-                            )
-                            .background(
-                                Capsule()
-                                    .fill(
-                                        Color(
-                                            hex:
-                                                "EDEBEB"
-                                        )
-                                    )
-                            )
-                        }
-                    }
-                    .frame(
-                        width: 300
-                    )
-                    .padding(
-                        .vertical,
-                        18
-                    )
-                    .background(
-                        RoundedRectangle(
-                            cornerRadius: 12
-                        )
-                        .fill(
-                            Color(hex: "F5F0F0")
-                        )
-                    )
-                    .padding(
-                        .top,
-                        50
-                    )
-
-                } else {
-
-                    // MARK: Error / Empty State
-
-                    VStack(spacing: 12) {
-
-                        if let errorMessage {
-
-                            Text(
-                                errorMessage
-                            )
-                            .font(
-                                .system(
-                                    size: 14,
-                                    weight: .regular
-                                )
-                            )
-                            .foregroundStyle(
-                                .red
-                            )
-                            .multilineTextAlignment(
-                                .center
-                            )
-
-                            Button {
-
-                                Task {
-
-                                    await generateSuggestion(
-                                        isAnotherIdea:
-                                            false
-                                    )
-                                }
-
-                            } label: {
-
-                                Text(
-                                    "Try Again"
+                                    "Finding something for you..."
                                 )
                                 .font(
                                     .system(
                                         size: 16,
-                                        weight: .medium
+                                        weight: .regular
                                     )
                                 )
                                 .foregroundStyle(
-                                    Color(
-                                        hex:
-                                            "75608E"
-                                    )
+                                    Color(hex: "563D6A")
                                 )
                             }
-                            .buttonStyle(.plain)
+                            .frame(
+                                width: 300,
+                                height: 115
+                            )
+                            .background(
+                                RoundedRectangle(
+                                    cornerRadius: 12
+                                )
+                                .fill(
+                                    Color(hex: "F5F0F0")
+                                )
+                            )
+
+
+                        } else if let suggestion =
+                                    generatedSuggestion {
+
+                            // MARK: AI Suggestion Card
+
+                            VStack(spacing: 14) {
+
+                                Text(
+                                    suggestion.activity
+                                )
+                                .font(
+                                    .system(
+                                        size: 18,
+                                        weight: .regular
+                                    )
+                                )
+                                .foregroundStyle(
+                                    Color(hex: "563D6A")
+                                )
+                                .multilineTextAlignment(
+                                    .center
+                                )
+                                .lineSpacing(2)
+                                .fixedSize(
+                                    horizontal: false,
+                                    vertical: true
+                                )
+
+
+                                HStack(
+                                    spacing: 20
+                                ) {
+
+                                    // MARK: Estimated Time
+
+                                    HStack(spacing: 7) {
+
+                                        Image(
+                                            systemName:
+                                                "clock"
+                                        )
+                                        .font(
+                                            .system(
+                                                size: 15,
+                                                weight: .medium
+                                            )
+                                        )
+                                        .foregroundStyle(
+                                            Color(
+                                                hex:
+                                                    "7049DD"
+                                            )
+                                        )
+
+
+                                        Text(
+                                            "\(suggestion.estimatedMinutes) min"
+                                        )
+                                        .font(
+                                            .system(
+                                                size: 14,
+                                                weight: .regular
+                                            )
+                                        )
+                                        .foregroundStyle(
+                                            Color(
+                                                hex:
+                                                    "563D6A"
+                                            )
+                                        )
+                                    }
+                                    .padding(
+                                        .horizontal,
+                                        12
+                                    )
+                                    .frame(
+                                        height: 30
+                                    )
+                                    .background(
+                                        Capsule()
+                                            .fill(
+                                                Color(
+                                                    hex:
+                                                        "EDEBEB"
+                                                )
+                                            )
+                                    )
+
+
+                                    // MARK: Difficulty
+
+                                    HStack(spacing: 7) {
+
+                                        Image(
+                                            systemName:
+                                                "chart.bar.fill"
+                                        )
+                                        .font(
+                                            .system(
+                                                size: 14,
+                                                weight: .medium
+                                            )
+                                        )
+                                        .foregroundStyle(
+                                            Color(
+                                                hex:
+                                                    "7049DD"
+                                            )
+                                        )
+
+
+                                        Text(
+                                            suggestion.difficulty
+                                        )
+                                        .font(
+                                            .system(
+                                                size: 14,
+                                                weight: .regular
+                                            )
+                                        )
+                                        .foregroundStyle(
+                                            Color(
+                                                hex:
+                                                    "563D6A"
+                                            )
+                                        )
+                                    }
+                                    .padding(
+                                        .horizontal,
+                                        12
+                                    )
+                                    .frame(
+                                        height: 30
+                                    )
+                                    .background(
+                                        Capsule()
+                                            .fill(
+                                                Color(
+                                                    hex:
+                                                        "EDEBEB"
+                                                )
+                                            )
+                                    )
+                                }
+                            }
+                            .frame(
+                                width: 300
+                            )
+                            .padding(
+                                .vertical,
+                                18
+                            )
+                            .background(
+                                RoundedRectangle(
+                                    cornerRadius: 12
+                                )
+                                .fill(
+                                    Color(hex: "F5F0F0")
+                                )
+                            )
+
+
+                        } else {
+
+                            // MARK: Error / Empty State
+
+                            VStack(spacing: 12) {
+
+                                if let errorMessage {
+
+                                    Text(
+                                        errorMessage
+                                    )
+                                    .font(
+                                        .system(
+                                            size: 14,
+                                            weight: .regular
+                                        )
+                                    )
+                                    .foregroundStyle(
+                                        .red
+                                    )
+                                    .multilineTextAlignment(
+                                        .center
+                                    )
+
+
+                                    Button {
+
+                                        Task {
+
+                                            await generateSuggestion(
+                                                isAnotherIdea:
+                                                    true
+                                            )
+                                        }
+
+                                    } label: {
+
+                                        Text(
+                                            "Try Again"
+                                        )
+                                        .font(
+                                            .system(
+                                                size: 16,
+                                                weight: .medium
+                                            )
+                                        )
+                                        .foregroundStyle(
+                                            Color(
+                                                hex:
+                                                    "75608E"
+                                            )
+                                        )
+                                    }
+                                    .buttonStyle(.plain)
+                                }
+                            }
+                            .frame(
+                                width: 300
+                            )
+                            .frame(
+                                minHeight: 115
+                            )
+                            .padding(
+                                .vertical,
+                                18
+                            )
+                            .background(
+                                RoundedRectangle(
+                                    cornerRadius: 12
+                                )
+                                .fill(
+                                    Color(hex: "F5F0F0")
+                                )
+                            )
                         }
                     }
-                    .frame(width: 300)
-                    .frame(minHeight: 115)
-
-                    .padding(
-                        .vertical,
-                        18
-                    )
-                    .background(
-                        RoundedRectangle(
-                            cornerRadius: 12
-                        )
-                        .fill(
-                            Color(hex: "F5F0F0")
-                        )
-                    )
                     .padding(
                         .top,
                         50
                     )
-                }
 
-                Spacer(
-                    minLength: 24
-                )
 
-                // MARK: - Buttons
+                    // MARK: - Buttons
 
-                VStack(spacing: 10) {
+                    VStack(spacing: 10) {
 
-                    // MARK: Start Activity
+                        // MARK: Start Activity
 
-                    Button {
+                        Button {
 
-                        startActivity()
+                            startActivity()
 
-                    } label: {
+                        } label: {
 
-                        Text(
-                            "Start Activity"
-                        )
-                        .font(
-                            .system(
-                                size: 22,
-                                weight: .regular
+                            Text(
+                                "Start Activity"
                             )
-                        )
-                        .foregroundStyle(
-                            .white
-                        )
-                        .frame(
-                            width: 300,
-                            height: 50
-                        )
-                        .background(
-                            Capsule()
-                                .fill(
-                                    Color(
-                                        hex:
-                                            "75608E"
-                                    )
+                            .font(
+                                .system(
+                                    size: 22,
+                                    weight: .regular
                                 )
-                        )
-                    }
-                    .buttonStyle(.plain)
-                    .disabled(
-                        generatedSuggestion == nil
-                        ||
-                        isGenerating
-                    )
-                    .opacity(
-                        generatedSuggestion == nil
-                        ||
-                        isGenerating
-                        ? 0.55
-                        : 1
-                    )
-
-                    // MARK: Another Idea
-
-                    Button {
-
-                        Task {
-
-                            await generateSuggestion(
-                                isAnotherIdea:
-                                    true
+                            )
+                            .foregroundStyle(
+                                .white
+                            )
+                            .frame(
+                                width: 300,
+                                height: 50
+                            )
+                            .background(
+                                Capsule()
+                                    .fill(
+                                        Color(
+                                            hex:
+                                                "75608E"
+                                        )
+                                    )
                             )
                         }
+                        .buttonStyle(.plain)
+                        .disabled(
+                            generatedSuggestion == nil
+                            ||
+                            isGenerating
+                        )
+                        .opacity(
+                            generatedSuggestion == nil
+                            ||
+                            isGenerating
+                            ? 0.55
+                            : 1
+                        )
 
-                    } label: {
 
-                        HStack(
-                            spacing: 8
-                        ) {
+                        // MARK: Another Idea
 
-                            if isGenerating {
+                        Button {
 
-                                ProgressView()
-                                    .tint(.white)
+                            Task {
 
-                            } else {
-
-                                Text(
-                                    "Another Idea"
+                                await generateSuggestion(
+                                    isAnotherIdea:
+                                        true
                                 )
                             }
-                        }
-                        .font(
-                            .system(
-                                size: 22,
-                                weight: .regular
-                            )
-                        )
-                        .foregroundStyle(
-                            .white
-                        )
-                        .frame(
-                            width: 300,
-                            height: 50
-                        )
-                        .background(
-                            Capsule()
-                                .fill(
-                                    Color(
-                                        hex:
-                                            "A897BD"
+
+                        } label: {
+
+                            HStack(
+                                spacing: 8
+                            ) {
+
+                                if isGenerating {
+
+                                    ProgressView()
+                                        .tint(.white)
+
+                                } else {
+
+                                    Text(
+                                        "Another Idea"
                                     )
+                                }
+                            }
+                            .font(
+                                .system(
+                                    size: 22,
+                                    weight: .regular
                                 )
+                            )
+                            .foregroundStyle(
+                                .white
+                            )
+                            .frame(
+                                width: 300,
+                                height: 50
+                            )
+                            .background(
+                                Capsule()
+                                    .fill(
+                                        Color(
+                                            hex:
+                                                "A897BD"
+                                        )
+                                    )
+                            )
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(
+                            generatedSuggestion == nil
+                            ||
+                            isGenerating
+                        )
+                        .opacity(
+                            generatedSuggestion == nil
+                            ||
+                            isGenerating
+                            ? 0.55
+                            : 1
                         )
                     }
-                    .buttonStyle(.plain)
-                    .disabled(
-                        generatedSuggestion == nil
-                        ||
-                        isGenerating
+                    .padding(
+                        .top,
+                        34
                     )
-                    .opacity(
-                        generatedSuggestion == nil
-                        ||
-                        isGenerating
-                        ? 0.55
-                        : 1
+                    .padding(
+                        .bottom,
+                        30
                     )
                 }
-                .padding(
-                    .bottom,
-                    30
+                .frame(
+                    maxWidth: .infinity
                 )
             }
+
+
+            // MARK: - Fixed Back and Home
+
+            HStack {
+
+                Button {
+
+                    dismiss()
+
+                } label: {
+
+                    Image(
+                        systemName:
+                            "chevron.left"
+                    )
+                    .font(
+                        .system(
+                            size: 20,
+                            weight: .medium
+                        )
+                    )
+                    .foregroundStyle(
+                        Color(hex: "75608E")
+                    )
+                    .frame(
+                        width: 32,
+                        height: 32
+                    )
+                    .contentShape(
+                        Rectangle()
+                    )
+                }
+                .buttonStyle(.plain)
+
+
+                Spacer()
+
+
+                NavigationLink {
+
+                    MainTabView()
+
+                } label: {
+
+                    Image(
+                        systemName:
+                            "house"
+                    )
+                    .font(
+                        .system(
+                            size: 27,
+                            weight: .semibold
+                        )
+                    )
+                    .foregroundStyle(
+                        Color(hex: "75608E")
+                    )
+                    .frame(
+                        width: 38,
+                        height: 38
+                    )
+                    .contentShape(
+                        Rectangle()
+                    )
+                }
+                .buttonStyle(.plain)
+            }
+            .padding(
+                .horizontal,
+                24
+            )
+            .padding(
+                .top,
+                4
+            )
+            .padding(
+                .bottom,
+                8
+            )
+            .background(
+                Color(hex: "FFF7F1")
+            )
+            .zIndex(10)
         }
+
 
         // MARK: - Generate First Suggestion
 
@@ -610,17 +664,21 @@ struct SuggestionResultView: View {
             guard
                 !hasGeneratedInitialSuggestion
             else {
+
                 return
             }
 
+
             hasGeneratedInitialSuggestion =
                 true
+
 
             await generateSuggestion(
                 isAnotherIdea:
                     false
             )
         }
+
 
         // MARK: - Feedback Navigation
 
@@ -637,6 +695,7 @@ struct SuggestionResultView: View {
                 )
             }
         }
+
 
         .toolbar(
             .hidden,
@@ -665,13 +724,15 @@ struct SuggestionResultView: View {
             return
         }
 
+
         guard !isGenerating else {
+
             return
         }
 
-        // إذا المستخدم ضغط Another Idea
-        // نحفظ الاقتراح الحالي مؤقتًا
-        // عشان AI ما يعيده
+
+        // MARK: - Save Current Suggestion Before Another Idea
+
         if isAnotherIdea,
            let currentSuggestion =
                 generatedSuggestion {
@@ -683,20 +744,59 @@ struct SuggestionResultView: View {
                             .whitespacesAndNewlines
                     )
 
-            if !currentText.isEmpty,
-               !previousSuggestions.contains(
-                    currentText
-               ) {
 
-                previousSuggestions.append(
+            if !currentText.isEmpty {
+
+                let normalizedCurrent =
                     currentText
-                )
+                        .lowercased()
+
+
+                let alreadyStored =
+                    previousSuggestions
+                        .contains {
+                            previous in
+
+                            previous
+                                .trimmingCharacters(
+                                    in:
+                                        .whitespacesAndNewlines
+                                )
+                                .lowercased()
+                            ==
+                            normalizedCurrent
+                        }
+
+
+                if !alreadyStored {
+
+                    previousSuggestions
+                        .append(
+                            currentText
+                        )
+                }
             }
+
+
+            // مهم:
+            // نخفي الاقتراح القديم أثناء طلب فكرة جديدة.
+            //
+            // إذا فشل الـ AI بسبب duplicateSuggestion
+            // لن يبقى الاقتراح القديم ظاهرًا وكأنه تولّد مرة ثانية.
+
+            generatedSuggestion =
+                nil
         }
 
-        isGenerating = true
 
-        errorMessage = nil
+        // MARK: - Start Loading
+
+        isGenerating =
+            true
+
+        errorMessage =
+            nil
+
 
         do {
 
@@ -725,20 +825,49 @@ struct SuggestionResultView: View {
                             suggestionHistory
                     )
 
+
+            // MARK: - New Successful Suggestion
+
             generatedSuggestion =
                 suggestion
+
+
+            print(
+                """
+                Suggestion generated successfully:
+
+                \(suggestion.activity)
+                """
+            )
+
 
         } catch {
 
             print(
-                "Suggestion generation failed: \(error)"
+                """
+                Suggestion generation failed:
+                \(error)
+                """
             )
 
+
+            // مهم:
+            // نخلي generatedSuggestion = nil
+            // حتى تظهر رسالة الخطأ بدل الاقتراح القديم.
+
+            generatedSuggestion =
+                nil
+
+
             errorMessage =
-                "We couldn’t find a suggestion right now. Please try again."
+                "We couldn’t find a different suggestion right now. Please try again."
         }
 
-        isGenerating = false
+
+        // MARK: - Stop Loading
+
+        isGenerating =
+            false
     }
 
 
@@ -757,8 +886,10 @@ struct SuggestionResultView: View {
             let selectedLocation
 
         else {
+
             return
         }
+
 
         // MARK: Save Chosen Activity
 
@@ -796,31 +927,36 @@ struct SuggestionResultView: View {
                     nil
             )
 
+
         modelContext.insert(
             activity
         )
+
 
         do {
 
             try modelContext.save()
 
+
             print(
                 "Suggestion activity saved: \(suggestion.activity)"
             )
 
-            // نخزن نفس النشاط الذي بدأه المستخدم
-            // عشان نمرره لصفحة Feedback
+
             startedActivity =
                 activity
 
+
             goToFeedback =
                 true
+
 
         } catch {
 
             print(
                 "Failed to save suggestion activity: \(error)"
             )
+
 
             errorMessage =
                 "We couldn’t save this activity. Please try again."
@@ -857,4 +993,3 @@ struct SuggestionResultView: View {
         inMemory: true
     )
 }
-

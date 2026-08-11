@@ -26,6 +26,10 @@ struct FeedbackView: View {
 
     @State private var showSavedBanner = false
 
+    // MARK: - Navigation
+
+    @State private var goToHome = false
+
     var body: some View {
 
         ZStack(alignment: .top) {
@@ -35,7 +39,7 @@ struct FeedbackView: View {
 
             VStack(spacing: 0) {
 
-                // MARK: - Back and Home
+                // MARK: - Back
 
                 HStack {
 
@@ -64,34 +68,6 @@ struct FeedbackView: View {
                     .buttonStyle(.plain)
 
                     Spacer()
-
-                    // MARK: Home
-
-                    NavigationLink {
-
-                        MainTabView()
-
-                    } label: {
-
-                        Image(systemName: "house")
-                            .font(
-                                .system(
-                                    size: 27,
-                                    weight: .semibold
-                                )
-                            )
-                            .foregroundStyle(
-                                Color(hex: "75608E")
-                            )
-                            .frame(
-                                width: 38,
-                                height: 38
-                            )
-                            .contentShape(
-                                Rectangle()
-                            )
-                    }
-                    .buttonStyle(.plain)
                 }
                 .padding(
                     .horizontal,
@@ -255,6 +231,16 @@ struct FeedbackView: View {
             for: .navigationBar
         )
 
+        // MARK: - Navigate Home After Saving
+
+        .navigationDestination(
+            isPresented:
+                $goToHome
+        ) {
+
+            MainTabView()
+        }
+
         // لو كان النشاط عليه Feedback محفوظ سابقًا
         // نظهر اختياره عند فتح الصفحة
         .onAppear {
@@ -389,12 +375,13 @@ struct FeedbackView: View {
                     true
             }
 
-            // يختفي بعد ثانيتين
+            // MARK: - Return Home Automatically
+
             DispatchQueue
                 .main
                 .asyncAfter(
                     deadline:
-                        .now() + 2
+                        .now() + 1.5
                 ) {
 
                     withAnimation(
@@ -406,6 +393,9 @@ struct FeedbackView: View {
                         showSavedBanner =
                             false
                     }
+
+                    goToHome =
+                        true
                 }
 
         } catch {

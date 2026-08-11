@@ -20,7 +20,6 @@ struct SuggestionCategoryView: View {
 
                 VStack(spacing: 0) {
 
-                    // سهم الرجوع بدون دائرة أو خلفية
                     HStack {
                         Button {
                             dismiss()
@@ -38,7 +37,6 @@ struct SuggestionCategoryView: View {
                     .padding(.horizontal, 22)
                     .padding(.top, 8)
 
-                    // العنوان كامل بدون نقاط
                     Text("What do you need\nright now?")
                         .font(.system(size: 36, weight: .regular))
                         .foregroundStyle(Color(hex: "37008A"))
@@ -48,7 +46,6 @@ struct SuggestionCategoryView: View {
                         .frame(maxWidth: .infinity)
                         .padding(.top, 43)
 
-                    // قللنا المسافة بين العنوان والوصف
                     Text("Select what feels most helpful at this moment.")
                         .font(.system(size: 16, weight: .regular))
                         .foregroundStyle(Color(hex: "37008A"))
@@ -56,7 +53,6 @@ struct SuggestionCategoryView: View {
                         .padding(.horizontal, 35)
                         .padding(.top, 50)
 
-                    // رفعنا الكاردات للأعلى
                     LazyVGrid(
                         columns: [
                             GridItem(.fixed(159), spacing: 14),
@@ -73,7 +69,6 @@ struct SuggestionCategoryView: View {
 
                     Spacer(minLength: 20)
 
-                    // الزر صار أنزل قليلًا
                     NavigationLink {
                         SuggestionPersonalizationView(
                             selectedCategory: selectedCategory

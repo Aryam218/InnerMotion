@@ -10,17 +10,17 @@ import SwiftData
 
 @main
 struct InnerMotionApp: App {
+
     var body: some Scene {
+
         WindowGroup {
+
             ContentView()
         }
-        .modelContainer(for: [
-            UserTask.self,
-            DayPlan.self,
-            PlannedTask.self,
-            TaskStep.self,
-            SuggestionActivity.self
-        ])
+        .modelContainer(
+            TaskIntentDataStore
+                .shared
+                .container
+        )
     }
 }
-

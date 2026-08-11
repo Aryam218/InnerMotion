@@ -465,52 +465,82 @@ struct StepCard: View {
 
     var body: some View {
 
-        RoundedRectangle(
-            cornerRadius: 18
+        HStack(
+            alignment: .center,
+            spacing: 18
+        ) {
+
+            // MARK: - Step Number
+
+            Circle()
+                .stroke(
+                    Color.secondaryText,
+                    lineWidth: 2
+                )
+                .frame(
+                    width: 38,
+                    height: 38
+                )
+                .overlay {
+
+                    Text(number)
+                        .foregroundColor(
+                            .secondaryText
+                        )
+                }
+
+            // MARK: - Step Text
+
+            Text(text)
+                .foregroundColor(
+                    .secondaryText
+                )
+                .font(
+                    .system(size: 20)
+                )
+                .multilineTextAlignment(
+                    .leading
+                )
+                .fixedSize(
+                    horizontal: false,
+                    vertical: true
+                )
+                .frame(
+                    maxWidth: .infinity,
+                    alignment: .leading
+                )
+
+            Spacer(
+                minLength: 0
+            )
+        }
+        .padding(
+            .horizontal,
+            18
         )
-        .fill(
-            highlight
-            ? Color.selectedCard
-            : Color.cardColor
+        .padding(
+            .vertical,
+            14
         )
-        .frame(height: 70)
-        .overlay(
-
-            HStack(spacing: 18) {
-
-                Circle()
-                    .stroke(
-                        Color.secondaryText,
-                        lineWidth: 2
-                    )
-                    .frame(
-                        width: 38,
-                        height: 38
-                    )
-                    .overlay(
-
-                        Text(number)
-                            .foregroundColor(
-                                .secondaryText
-                            )
-                    )
-
-                Text(text)
-                    .foregroundColor(
-                        .secondaryText
-                    )
-                    .font(
-                        .system(size: 20)
-                    )
-
-                Spacer()
-            }
-            .padding(
-                .horizontal,
-                18
+        .frame(
+            maxWidth: .infinity
+        )
+        .frame(
+            minHeight: 70
+        )
+        .background(
+            RoundedRectangle(
+                cornerRadius: 18
+            )
+            .fill(
+                highlight
+                ? Color.selectedCard
+                : Color.cardColor
             )
         )
-        .padding(.horizontal)
+        .padding(
+            .horizontal
+        )
     }
 }
 
