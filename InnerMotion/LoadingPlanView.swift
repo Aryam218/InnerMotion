@@ -5,12 +5,6 @@
 //  Created by sabaalzuqzuq on 22/02/1448 AH.
 //
 
-
-//
-//  LoadingPlanView.swift
-//  team15
-//
-
 import SwiftUI
 import SwiftData
 
@@ -208,8 +202,7 @@ struct LoadingPlanView: View {
 
                             ForEach(
                                 Array(
-                                    checklistItems
-                                        .enumerated()
+                                    checklistItems.enumerated()
                                 ),
                                 id: \.offset
                             ) { index, item in
@@ -245,6 +238,8 @@ struct LoadingPlanView: View {
                                         )
                                     }
 
+                                    // MARK: - Checklist Text
+
                                     Text(item)
                                         .font(
                                             .system(
@@ -258,19 +253,23 @@ struct LoadingPlanView: View {
                                             horizontal: false,
                                             vertical: true
                                         )
+                                        .offset(
+                                            y:
+                                                index == checklistItems.count - 1
+                                                ? 5
+                                                : 0
+                                        )
 
                                     Spacer()
                                 }
                                 .opacity(
-                                    visibleItemCount
-                                        > index
+                                    visibleItemCount > index
                                     ? 1
                                     : 0
                                 )
                                 .offset(
                                     y:
-                                        visibleItemCount
-                                            > index
+                                        visibleItemCount > index
                                         ? 0
                                         : 8
                                 )
@@ -378,14 +377,11 @@ struct LoadingPlanView: View {
 
         .task {
 
-            guard
-                !hasStartedGenerating
-            else {
+            guard !hasStartedGenerating else {
                 return
             }
 
-            hasStartedGenerating =
-                true
+            hasStartedGenerating = true
 
             runVisualSequence()
 
@@ -395,12 +391,10 @@ struct LoadingPlanView: View {
         // MARK: - Single Task Navigation
 
         .navigationDestination(
-            isPresented:
-                $goToSingleTask
+            isPresented: $goToSingleTask
         ) {
 
-            if let task =
-                generatedTasks.first {
+            if let task = generatedTasks.first {
 
                 PlanOneTask(
                     task: task
@@ -411,46 +405,38 @@ struct LoadingPlanView: View {
         // MARK: - Multiple Tasks Navigation
 
         .navigationDestination(
-            isPresented:
-                $goToMultipleTasks
+            isPresented: $goToMultipleTasks
         ) {
 
             MultipleTaks(
-                tasks:
-                    generatedTasks
+                tasks: generatedTasks
             )
         }
 
-        .navigationBarHidden(
-            true
-        )
+        .navigationBarHidden(true)
     }
 
     // MARK: - Visual Loading Animation
 
     private func runVisualSequence() {
 
-        for index in
-            0..<checklistItems.count {
+        for index in 0..<checklistItems.count {
 
-            DispatchQueue.main
-                .asyncAfter(
-                    deadline:
-                        .now()
-                        + Double(index)
-                        * 0.6
+            DispatchQueue.main.asyncAfter(
+                deadline:
+                    .now()
+                    + Double(index) * 0.6
+            ) {
+
+                withAnimation(
+                    .easeOut(
+                        duration: 0.4
+                    )
                 ) {
 
-                    withAnimation(
-                        .easeOut(
-                            duration: 0.4
-                        )
-                    ) {
-
-                        visibleItemCount =
-                            index + 1
-                    }
+                    visibleItemCount = index + 1
                 }
+            }
         }
     }
 
@@ -460,9 +446,7 @@ struct LoadingPlanView: View {
     private func generatePlan() async {
 
         // فقط مهام الجلسة الحالية
-        guard
-            !userTasks.isEmpty
-        else {
+        guard !userTasks.isEmpty else {
 
             errorMessage =
                 "No tasks were found for this planning session."
@@ -470,11 +454,8 @@ struct LoadingPlanView: View {
             return
         }
 
-        // فقط Energy + Time
-        // الخاصة بنفس الجلسة
-        guard
-            let currentDayPlan
-        else {
+        // فقط Energy + Time الخاصة بنفس الجلسة
+        guard let currentDayPlan else {
 
             errorMessage =
                 "No day plan was found for this planning session."
@@ -491,20 +472,12 @@ struct LoadingPlanView: View {
                 TaskPlanningService
                     .shared
                     .generatePlan(
-                        tasks:
-                            userTasks,
-
-                        dayPlan:
-                            currentDayPlan
+                        tasks: userTasks,
+                        dayPlan: currentDayPlan
                     )
 
-            // كل UserTask
-            // لازم تنتج PlannedTask واحدة
-            guard
-                result.tasks.count
-                ==
-                userTasks.count
-            else {
+            // كل UserTask لازم تنتج PlannedTask واحدة
+            guard result.tasks.count == userTasks.count else {
 
                 errorMessage =
                     "The generated plan does not match the original tasks."
@@ -515,26 +488,8 @@ struct LoadingPlanView: View {
             // MARK: - Delete Previous Plan
             // For Current Session Only
 
-            /*
-             مهم جدًا:
-
-             ما عاد نمسح كل PlannedTask
-             في التطبيق.
-
-             فقط نمسح الخطط القديمة
-             الخاصة بنفس sessionID الحالية.
-
-             الخطط القديمة لجلسات أخرى
-             تظل محفوظة.
-             */
-
-            for plannedTask in
-                existingPlannedTasks
-            where
-                plannedTask
-                    .planningSessionID
-                ==
-                sessionID {
+            for plannedTask in existingPlannedTasks
+            where plannedTask.planningSessionID == sessionID {
 
                 modelContext.delete(
                     plannedTask
@@ -543,22 +498,16 @@ struct LoadingPlanView: View {
 
             // MARK: - Build New Planned Tasks
 
-            var newPlannedTasks:
-                [PlannedTask] = []
+            var newPlannedTasks: [PlannedTask] = []
 
             for (
                 taskIndex,
                 generatedTask
-            ) in
-                result.tasks
-                    .enumerated() {
+            ) in result.tasks.enumerated() {
 
-                // المهمة الأصلية
-                // المقابلة لرد AI
+                // المهمة الأصلية المقابلة لرد AI
                 let originalTask =
-                    userTasks[
-                        taskIndex
-                    ]
+                    userTasks[taskIndex]
 
                 // MARK: - Build Steps
 
@@ -570,18 +519,14 @@ struct LoadingPlanView: View {
                             generatedStep in
 
                             TaskStep(
-
                                 order:
-                                    stepIndex
-                                    + 1,
+                                    stepIndex + 1,
 
                                 text:
-                                    generatedStep
-                                        .text,
+                                    generatedStep.text,
 
                                 estimatedMinutes:
-                                    generatedStep
-                                        .estimatedMinutes,
+                                    generatedStep.estimatedMinutes,
 
                                 isCompleted:
                                     false
@@ -595,23 +540,19 @@ struct LoadingPlanView: View {
 
                         // عنوان المستخدم الأصلي
                         title:
-                            originalTask
-                                .title,
+                            originalTask.title,
 
                         // Priority الأصلية
                         priority:
-                            originalTask
-                                .priority,
+                            originalTask.priority,
 
                         // Due Date الأصلية
                         dueDate:
-                            originalTask
-                                .dueDate,
+                            originalTask.dueDate,
 
                         // ترتيب المهمة
                         order:
-                            taskIndex
-                            + 1,
+                            taskIndex + 1,
 
                         // نفس جلسة التخطيط
                         planningSessionID:
@@ -626,46 +567,20 @@ struct LoadingPlanView: View {
                     plannedTask
                 )
 
-                newPlannedTasks
-                    .append(
-                        plannedTask
-                    )
+                newPlannedTasks.append(
+                    plannedTask
+                )
             }
 
             // MARK: - Save Generated Plan
-
-            /*
-             أول شيء نحفظ:
-
-             PlannedTask
-             +
-             TaskStep
-
-             لو الحفظ فشل،
-             ما نعتمد UserTask.
-             */
 
             try modelContext.save()
 
             // MARK: - Mark User Tasks As Planned
 
-            /*
-             AI خلص بنجاح
-             والخطة انحفظت فعليًا.
+            for userTask in userTasks {
 
-             الآن فقط نغير:
-
-             isPlanned = true
-
-             وبالتالي تظهر المهمة
-             في TaskListView.
-             */
-
-            for userTask in
-                userTasks {
-
-                userTask.isPlanned =
-                    true
+                userTask.isPlanned = true
             }
 
             try modelContext.save()
@@ -673,13 +588,10 @@ struct LoadingPlanView: View {
             // MARK: - Store Generated Tasks
 
             generatedTasks =
-                newPlannedTasks
-                    .sorted {
+                newPlannedTasks.sorted {
 
-                        $0.order
-                        <
-                        $1.order
-                    }
+                    $0.order < $1.order
+                }
 
             // MARK: - Finish Loading Animation
 
@@ -692,44 +604,27 @@ struct LoadingPlanView: View {
                 progress = 1.0
 
                 visibleItemCount =
-                    checklistItems
-                        .count
+                    checklistItems.count
             }
 
-            // نخلي المستخدم يشوف
-            // اكتمال الشريط
+            // نخلي المستخدم يشوف اكتمال الشريط
+
             try? await Task.sleep(
                 for:
-                    .milliseconds(
-                        850
-                    )
+                    .milliseconds(850)
             )
 
             onComplete()
 
             // MARK: - Navigation Decision
 
-            /*
-             القرار يعتمد على
-             مهام هذه الجلسة فقط.
-
-             1 Task
-             → PlanOneTask
-
-             > 1
-             → MultipleTaks
-             */
-
             if userTasks.count == 1 {
 
-                goToSingleTask =
-                    true
+                goToSingleTask = true
 
-            } else if
-                userTasks.count > 1 {
+            } else if userTasks.count > 1 {
 
-                goToMultipleTasks =
-                    true
+                goToMultipleTasks = true
             }
 
         } catch {
@@ -737,8 +632,12 @@ struct LoadingPlanView: View {
             print("========== AI ERROR ==========")
             print("Error: \(error)")
             print("Type: \(type(of: error))")
-            print("Description: \(error.localizedDescription)")
-            print("NSError: \(error as NSError)")
+            print(
+                "Description: \(error.localizedDescription)"
+            )
+            print(
+                "NSError: \(error as NSError)"
+            )
             print("==============================")
 
             errorMessage =
@@ -755,8 +654,7 @@ struct LoadingPlanView: View {
     NavigationStack {
 
         LoadingPlanView(
-            sessionID:
-                UUID()
+            sessionID: UUID()
         )
     }
     .modelContainer(
