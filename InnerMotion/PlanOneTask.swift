@@ -42,6 +42,7 @@ struct PlanOneTask: View {
 
                 HStack {
 
+                    // Back
                     Button {
 
                         if let onBack {
@@ -55,17 +56,26 @@ struct PlanOneTask: View {
                         Image(
                             systemName: "chevron.left"
                         )
-                        .font(.title2)
-                    }
-                    .buttonStyle(
-                        PressableIconStyle(
-                            normalColor: .primaryText,
-                            pressedColor: .secondaryButton
+                        .font(
+                            .system(
+                                size: 20,
+                                weight: .medium
+                            )
                         )
-                    )
+                        .foregroundStyle(
+                            Color(hex: "75608E")
+                        )
+                        .frame(
+                            width: 32,
+                            height: 32
+                        )
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
 
                     Spacer()
 
+                    // Home
                     NavigationLink {
                         MainTabView()
                     } label: {
@@ -74,18 +84,24 @@ struct PlanOneTask: View {
                             systemName: "house"
                         )
                         .font(
-                            .system(size: 28)
+                            .system(
+                                size: 27,
+                                weight: .semibold
+                            )
                         )
+                        .foregroundStyle(
+                            Color(hex: "75608E")
+                        )
+                        .frame(
+                            width: 38,
+                            height: 38
+                        )
+                        .contentShape(Rectangle())
                     }
-                    .buttonStyle(
-                        PressableIconStyle(
-                            normalColor: .primaryText,
-                            pressedColor: .secondaryButton
-                        )
-                    )
+                    .buttonStyle(.plain)
                 }
-                .padding(.horizontal, 25)
-                .padding(.top, 15)
+                .padding(.horizontal, 24)
+                .padding(.top, 10)
 
                 Spacer()
                     .frame(height: 25)

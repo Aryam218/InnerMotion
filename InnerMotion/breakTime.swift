@@ -16,69 +16,158 @@ struct breakTime: View {
 
             VStack {
 
-                // Top Bar (هوم بس، بدون سهم رجوع)
+                // MARK: - Top Bar
+
+                // هوم فقط، بدون زر باك
                 HStack {
+
                     Spacer()
 
                     NavigationLink {
                         MainTabView()
                     } label: {
+
                         Image(systemName: "house")
-                            .font(.system(size: 28))
+                            .font(
+                                .system(
+                                    size: 27,
+                                    weight: .semibold
+                                )
+                            )
+                            .foregroundStyle(
+                                Color(
+                                    red: 117 / 255,
+                                    green: 96 / 255,
+                                    blue: 142 / 255
+                                )
+                            )
+                            .frame(
+                                width: 38,
+                                height: 38
+                            )
+                            .contentShape(
+                                Rectangle()
+                            )
                     }
-                    .buttonStyle(PressableIconStyle(normalColor: .primaryButton, pressedColor: .secondaryButton))
+                    .buttonStyle(.plain)
                 }
-                .padding(.horizontal, 25)
-                .padding(.top, 15)
+                .padding(.horizontal, 24)
+                .padding(.top, 10)
 
-                Spacer().frame(height: 15)
+                Spacer()
+                    .frame(height: 15)
 
-                // الرسمة (كوب الشاي)
+                // MARK: - Break Image
+
                 Image("break")
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 320, height: 320)
+                    .frame(
+                        width: 320,
+                        height: 320
+                    )
 
-                Spacer().frame(height: 30)
+                Spacer()
+                    .frame(height: 30)
 
-                // العنوان
+                // MARK: - Title
+
                 Text("Taking a Break is Okay")
-                    .font(.system(size: 30, weight: .medium))
-                    .foregroundColor(.primaryText)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 20)
+                    .font(
+                        .system(
+                            size: 30,
+                            weight: .medium
+                        )
+                    )
+                    .foregroundColor(
+                        .primaryText
+                    )
+                    .multilineTextAlignment(
+                        .center
+                    )
+                    .padding(
+                        .horizontal,
+                        20
+                    )
 
-                Spacer().frame(height: 20)
+                Spacer()
+                    .frame(height: 20)
 
-                // النص الفرعي
+                // MARK: - Subtitle
+
                 VStack(spacing: 8) {
-                    Text("Take a moment to rest.")
-                    Text("We'll be here when you're ready.")
+
+                    Text(
+                        "Take a moment to rest."
+                    )
+
+                    Text(
+                        "We'll be here when you're ready."
+                    )
                 }
-                .font(.system(size: 17))
-                .foregroundColor(.secondaryText)
-                .multilineTextAlignment(.center)
+                .font(
+                    .system(size: 17)
+                )
+                .foregroundColor(
+                    .secondaryText
+                )
+                .multilineTextAlignment(
+                    .center
+                )
 
                 Spacer()
 
-                // زر الرجوع للخطوات (يرجعك لصفحة Focus One Step)
+                // MARK: - Back to My Steps
+
                 Button {
+
                     dismiss()
+
                 } label: {
+
                     Text("Back to My Steps")
-                        .font(.system(size: 20, weight: .medium))
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 58)
+                        .font(
+                            .system(
+                                size: 20,
+                                weight: .medium
+                            )
+                        )
+                        .frame(
+                            maxWidth: .infinity
+                        )
+                        .frame(
+                            height: 58
+                        )
                 }
-                .buttonStyle(PressableCapsuleStyle(fillColor: .primaryButton, cornerRadius: 29))
-                .padding(.horizontal, 35)
-                .padding(.bottom, 40)
+                .buttonStyle(
+                    PressableCapsuleStyle(
+                        fillColor: .primaryButton,
+                        cornerRadius: 29
+                    )
+                )
+                .padding(
+                    .horizontal,
+                    35
+                )
+                .padding(
+                    .bottom,
+                    40
+                )
             }
         }
-        .toolbar(.hidden, for: .navigationBar)
+        .toolbar(
+            .hidden,
+            for: .navigationBar
+        )
     }
 }
 
+
+// MARK: - Preview
+
 #Preview {
-    breakTime()
+
+    NavigationStack {
+        breakTime()
+    }
 }

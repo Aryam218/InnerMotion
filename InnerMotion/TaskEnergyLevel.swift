@@ -6,6 +6,9 @@
 import SwiftUI
 import SwiftData
 
+
+// MARK: - Task Energy Level
+
 enum TaskEnergyLevel: String, CaseIterable {
 
     case high = "High"
@@ -13,24 +16,11 @@ enum TaskEnergyLevel: String, CaseIterable {
     case low = "Low"
     case veryLow = "Very low"
 
-    var iconName: String {
-
-        switch self {
-
-        case .high, .medium:
-            return "face.smiling"
-
-        case .low, .veryLow:
-            return "face.dashed"
-        }
-    }
-
     var highlightColor: Color {
 
         switch self {
 
         case .high:
-
             return Color(
                 red: 0.796,
                 green: 0.835,
@@ -38,7 +28,6 @@ enum TaskEnergyLevel: String, CaseIterable {
             )
 
         case .medium:
-
             return Color(
                 red: 0.973,
                 green: 0.953,
@@ -46,7 +35,6 @@ enum TaskEnergyLevel: String, CaseIterable {
             )
 
         case .low:
-
             return Color(
                 red: 0.969,
                 green: 0.827,
@@ -54,7 +42,6 @@ enum TaskEnergyLevel: String, CaseIterable {
             )
 
         case .veryLow:
-
             return Color(
                 red: 1.0,
                 green: 0.804,
@@ -64,6 +51,8 @@ enum TaskEnergyLevel: String, CaseIterable {
     }
 }
 
+
+// MARK: - Time Option
 
 enum TimeOption: Equatable {
 
@@ -133,6 +122,8 @@ enum TimeOption: Equatable {
 }
 
 
+// MARK: - Plan Your Day View
+
 struct PlanYourDayView: View {
 
     @Environment(\.dismiss) private var dismiss
@@ -147,13 +138,13 @@ struct PlanYourDayView: View {
     @State private var selectedEnergy: TaskEnergyLevel? = nil
     @State private var selectedTime: TimeOption? = nil
 
-    @State private var isHomePressed = false
-
     @State private var showCustomTimePicker = false
     @State private var customMinutes: Int = 45
 
     // بعد الحفظ يروح للـ Loading
     @State private var navigateToLoading = false
+
+    // MARK: - Form Validation
 
     private var isFormComplete: Bool {
 
@@ -196,7 +187,10 @@ struct PlanYourDayView: View {
         blue: 0.965
     )
 
+    // MARK: - Time Options
+
     private let timeOptions: [TimeOption] = [
+
         .fifteenMin,
         .thirtyMin,
         .oneHour,
@@ -204,9 +198,12 @@ struct PlanYourDayView: View {
     ]
 
     private let columns = [
+
         GridItem(.flexible()),
         GridItem(.flexible())
     ]
+
+    // MARK: - Display Label
 
     private func displayLabel(
         for option: TimeOption
@@ -221,6 +218,9 @@ struct PlanYourDayView: View {
 
         return option.label
     }
+
+
+    // MARK: - Body
 
     var body: some View {
 
@@ -249,7 +249,8 @@ struct PlanYourDayView: View {
 
                 HStack {
 
-                    // Back
+                    // MARK: - Back Button
+
                     Button {
 
                         dismiss()
@@ -262,15 +263,30 @@ struct PlanYourDayView: View {
                         .font(
                             .system(
                                 size: 20,
-                                weight: .semibold
+                                weight: .medium
                             )
                         )
-                        .foregroundStyle(primary)
+                        .foregroundStyle(
+                            Color(
+                                red: 117 / 255,
+                                green: 96 / 255,
+                                blue: 142 / 255
+                            )
+                        )
+                        .frame(
+                            width: 32,
+                            height: 32
+                        )
+                        .contentShape(
+                            Rectangle()
+                        )
                     }
+                    .buttonStyle(.plain)
 
                     Spacer()
 
-                    // Home
+                    // MARK: - Home Button
+
                     NavigationLink {
 
                         MainTabView()
@@ -281,33 +297,37 @@ struct PlanYourDayView: View {
                             systemName: "house"
                         )
                         .font(
-                            .system(size: 24)
-                        )
-                        .foregroundStyle(
-                            buttonColor.opacity(
-                                isHomePressed
-                                ? 0.5
-                                : 1.0
+                            .system(
+                                size: 27,
+                                weight: .semibold
                             )
                         )
-                    }
-                    .simultaneousGesture(
-
-                        DragGesture(
-                            minimumDistance: 0
+                        .foregroundStyle(
+                            Color(
+                                red: 117 / 255,
+                                green: 96 / 255,
+                                blue: 142 / 255
+                            )
                         )
-                        .onChanged { _ in
-
-                            isHomePressed = true
-                        }
-                        .onEnded { _ in
-
-                            isHomePressed = false
-                        }
-                    )
+                        .frame(
+                            width: 38,
+                            height: 38
+                        )
+                        .contentShape(
+                            Rectangle()
+                        )
+                    }
+                    .buttonStyle(.plain)
                 }
-                .padding(.horizontal, 24)
-                .padding(.top, 16)
+                .padding(
+                    .horizontal,
+                    24
+                )
+                .padding(
+                    .top,
+                    10
+                )
+
 
                 // MARK: - Scrollable Content
 
@@ -318,7 +338,7 @@ struct PlanYourDayView: View {
                         spacing: 0
                     ) {
 
-                        // MARK: Title
+                        // MARK: - Title
 
                         VStack(spacing: 6) {
 
@@ -331,15 +351,21 @@ struct PlanYourDayView: View {
                                     weight: .regular
                                 )
                             )
-                            .foregroundStyle(primary)
+                            .foregroundStyle(
+                                primary
+                            )
 
                             Text(
                                 "This helps us create the best plan for you."
                             )
                             .font(
-                                .system(size: 16)
+                                .system(
+                                    size: 16
+                                )
                             )
-                            .foregroundStyle(secondary)
+                            .foregroundStyle(
+                                secondary
+                            )
                             .multilineTextAlignment(
                                 .center
                             )
@@ -347,7 +373,11 @@ struct PlanYourDayView: View {
                         .frame(
                             maxWidth: .infinity
                         )
-                        .padding(.top, 12)
+                        .padding(
+                            .top,
+                            12
+                        )
+
 
                         // MARK: - Energy Level
 
@@ -360,8 +390,16 @@ struct PlanYourDayView: View {
                                 weight: .bold
                             )
                         )
-                        .foregroundStyle(primary)
-                        .padding(.top, 44)
+                        .foregroundStyle(
+                            primary
+                        )
+                        .padding(
+                            .top,
+                            44
+                        )
+
+
+                        // MARK: - Energy Cards
 
                         HStack(spacing: 14) {
 
@@ -379,49 +417,60 @@ struct PlanYourDayView: View {
 
                                     VStack(spacing: 10) {
 
-                                        Image(
-                                            systemName:
-                                                level.iconName
-                                        )
-                                        .font(
-                                            .system(size: 40)
-                                        )
-                                        .foregroundStyle(
-                                            buttonColor
-                                        )
-                                        .frame(
-                                            maxWidth: .infinity
-                                        )
-                                        .frame(height: 84)
-                                        .background(
-                                            selectedEnergy == level
-                                            ? level.highlightColor
-                                            : fieldBackground
-                                        )
-                                        .clipShape(
+                                        ZStack {
+
                                             RoundedRectangle(
                                                 cornerRadius: 18
                                             )
-                                        )
+                                            .fill(
+                                                selectedEnergy == level
+                                                ? level.highlightColor
+                                                : fieldBackground
+                                            )
+                                            .frame(
+                                                height: 84
+                                            )
+
+                                            // الوجه
+                                            // نفسه الموجود في
+                                            // SuggestionPersonalizationView
+
+                                            TaskEnergyFaceView(
+                                                level: level,
+                                                color: buttonColor
+                                            )
+                                            .frame(
+                                                width: 53,
+                                                height: 53
+                                            )
+                                        }
 
                                         Text(
                                             level.rawValue
                                         )
                                         .font(
-                                            .system(size: 14)
+                                            .system(
+                                                size: 14
+                                            )
                                         )
                                         .foregroundStyle(
                                             primary
                                         )
                                     }
                                 }
-                                .buttonStyle(.plain)
+                                .buttonStyle(
+                                    .plain
+                                )
                             }
                         }
                         .frame(
                             maxWidth: .infinity
                         )
-                        .padding(.top, 18)
+                        .padding(
+                            .top,
+                            18
+                        )
+
 
                         // MARK: - Available Time
 
@@ -434,8 +483,16 @@ struct PlanYourDayView: View {
                                 weight: .bold
                             )
                         )
-                        .foregroundStyle(primary)
-                        .padding(.top, 52)
+                        .foregroundStyle(
+                            primary
+                        )
+                        .padding(
+                            .top,
+                            52
+                        )
+
+
+                        // MARK: - Time Cards
 
                         LazyVGrid(
                             columns: columns,
@@ -470,7 +527,9 @@ struct PlanYourDayView: View {
                                         )
                                     )
                                     .font(
-                                        .system(size: 18)
+                                        .system(
+                                            size: 18
+                                        )
                                     )
                                     .foregroundStyle(
                                         secondary
@@ -494,14 +553,26 @@ struct PlanYourDayView: View {
                                         )
                                     )
                                 }
-                                .buttonStyle(.plain)
+                                .buttonStyle(
+                                    .plain
+                                )
                             }
                         }
-                        .padding(.top, 18)
+                        .padding(
+                            .top,
+                            18
+                        )
                     }
-                    .padding(.horizontal, 24)
-                    .padding(.bottom, 24)
+                    .padding(
+                        .horizontal,
+                        24
+                    )
+                    .padding(
+                        .bottom,
+                        24
+                    )
                 }
+
 
                 // MARK: - Create My Plan
 
@@ -520,7 +591,9 @@ struct PlanYourDayView: View {
                             weight: .bold
                         )
                     )
-                    .foregroundStyle(.white)
+                    .foregroundStyle(
+                        .white
+                    )
                     .frame(
                         maxWidth: .infinity
                     )
@@ -537,7 +610,9 @@ struct PlanYourDayView: View {
                         )
                     )
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(
+                    .plain
+                )
                 .disabled(
                     !isFormComplete
                 )
@@ -557,7 +632,10 @@ struct PlanYourDayView: View {
             }
         }
 
-        .navigationBarHidden(true)
+        .navigationBarHidden(
+            true
+        )
+
 
         // MARK: - Custom Time Picker
 
@@ -568,15 +646,23 @@ struct PlanYourDayView: View {
 
             VStack(spacing: 20) {
 
-                Text("Custom time")
-                    .font(
-                        .system(
-                            size: 18,
-                            weight: .semibold
-                        )
+                Text(
+                    "Custom time"
+                )
+                .font(
+                    .system(
+                        size: 18,
+                        weight: .semibold
                     )
-                    .foregroundStyle(primary)
-                    .padding(.top, 24)
+                )
+                .foregroundStyle(
+                    primary
+                )
+                .padding(
+                    .top,
+                    24
+                )
+
 
                 Picker(
                     "Minutes",
@@ -601,7 +687,10 @@ struct PlanYourDayView: View {
                         .tag(minute)
                     }
                 }
-                .pickerStyle(.wheel)
+                .pickerStyle(
+                    .wheel
+                )
+
 
                 Button {
 
@@ -616,39 +705,53 @@ struct PlanYourDayView: View {
 
                 } label: {
 
-                    Text("Done")
-                        .font(
-                            .system(
-                                size: 16,
-                                weight: .semibold
-                            )
+                    Text(
+                        "Done"
+                    )
+                    .font(
+                        .system(
+                            size: 16,
+                            weight: .semibold
                         )
-                        .foregroundStyle(.white)
-                        .frame(
-                            maxWidth: .infinity
+                    )
+                    .foregroundStyle(
+                        .white
+                    )
+                    .frame(
+                        maxWidth: .infinity
+                    )
+                    .padding(
+                        .vertical,
+                        14
+                    )
+                    .background(
+                        buttonColor
+                    )
+                    .clipShape(
+                        RoundedRectangle(
+                            cornerRadius: 24
                         )
-                        .padding(
-                            .vertical,
-                            14
-                        )
-                        .background(
-                            buttonColor
-                        )
-                        .clipShape(
-                            RoundedRectangle(
-                                cornerRadius: 24
-                            )
-                        )
+                    )
                 }
-                .buttonStyle(.plain)
-                .padding(.horizontal)
-                .padding(.bottom, 24)
+                .buttonStyle(
+                    .plain
+                )
+                .padding(
+                    .horizontal
+                )
+                .padding(
+                    .bottom,
+                    24
+                )
             }
             .presentationDetents(
-                [.height(320)]
+                [
+                    .height(320)
+                ]
             )
         }
     }
+
 
     // MARK: - Save Day Plan
 
@@ -671,7 +774,6 @@ struct PlanYourDayView: View {
             availableMinutes:
                 availableMinutes,
 
-            // أهم شيء:
             // نفس Session المهام
             planningSessionID:
                 sessionID
@@ -702,6 +804,187 @@ struct PlanYourDayView: View {
 }
 
 
+// MARK: - Task Energy Face
+
+private struct TaskEnergyFaceView: View {
+
+    let level: TaskEnergyLevel
+    let color: Color
+
+    var body: some View {
+
+        GeometryReader { geometry in
+
+            let width =
+                geometry.size.width
+
+            let height =
+                geometry.size.height
+
+            ZStack {
+
+                // MARK: - Face Circle
+
+                Circle()
+                    .stroke(
+                        color,
+                        lineWidth: 2.7
+                    )
+
+
+                // MARK: - Left Eye
+
+                Circle()
+                    .fill(
+                        color
+                    )
+                    .frame(
+                        width: 5,
+                        height: 5
+                    )
+                    .position(
+                        x:
+                            width * 0.36,
+                        y:
+                            height * 0.42
+                    )
+
+
+                // MARK: - Right Eye
+
+                Circle()
+                    .fill(
+                        color
+                    )
+                    .frame(
+                        width: 5,
+                        height: 5
+                    )
+                    .position(
+                        x:
+                            width * 0.64,
+                        y:
+                            height * 0.42
+                    )
+
+
+                // MARK: - Mouth
+
+                mouthPath(
+                    width: width,
+                    height: height
+                )
+                .stroke(
+                    color,
+                    style:
+                        StrokeStyle(
+                            lineWidth: 2.7,
+                            lineCap: .round
+                        )
+                )
+            }
+        }
+    }
+
+
+    // MARK: - Mouth Path
+
+    private func mouthPath(
+        width: CGFloat,
+        height: CGFloat
+    ) -> Path {
+
+        var path = Path()
+
+        let start = CGPoint(
+            x:
+                width * 0.32,
+            y:
+                height * 0.60
+        )
+
+        let end = CGPoint(
+            x:
+                width * 0.68,
+            y:
+                height * 0.60
+        )
+
+        path.move(
+            to: start
+        )
+
+        switch level {
+
+        case .high:
+
+            // Happy
+
+            path.addQuadCurve(
+                to: end,
+                control:
+                    CGPoint(
+                        x:
+                            width * 0.50,
+                        y:
+                            height * 0.79
+                    )
+            )
+
+
+        case .medium:
+
+            // Soft Smile
+
+            path.addQuadCurve(
+                to: end,
+                control:
+                    CGPoint(
+                        x:
+                            width * 0.50,
+                        y:
+                            height * 0.71
+                    )
+            )
+
+
+        case .low:
+
+            // Sad
+
+            path.addQuadCurve(
+                to: end,
+                control:
+                    CGPoint(
+                        x:
+                            width * 0.50,
+                        y:
+                            height * 0.47
+                    )
+            )
+
+
+        case .veryLow:
+
+            // Very Sad
+
+            path.addQuadCurve(
+                to: end,
+                control:
+                    CGPoint(
+                        x:
+                            width * 0.50,
+                        y:
+                            height * 0.41
+                    )
+            )
+        }
+
+        return path
+    }
+}
+
+
 // MARK: - Preview
 
 #Preview {
@@ -709,7 +992,8 @@ struct PlanYourDayView: View {
     NavigationStack {
 
         PlanYourDayView(
-            sessionID: UUID()
+            sessionID:
+                UUID()
         )
     }
     .modelContainer(

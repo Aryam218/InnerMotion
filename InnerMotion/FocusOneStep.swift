@@ -8,7 +8,11 @@ import SwiftData
 
 private struct StepContentSizeKey: PreferenceKey {
     static var defaultValue: CGSize = .zero
-    static func reduce(value: inout CGSize, nextValue: () -> CGSize) {
+
+    static func reduce(
+        value: inout CGSize,
+        nextValue: () -> CGSize
+    ) {
         value = nextValue()
     }
 }
@@ -32,7 +36,7 @@ struct FocusOneStep: View {
     // يمنع محاولة تغيير الحالة أكثر من مرة
     @State private var hasMarkedInProgress = false
 
-    // حجم محتوى الخطوة الحالية (يتغير حسب طول النص)
+    // حجم محتوى الخطوة الحالية
     @State private var stepContentSize: CGSize = .zero
 
     // ترتيب الخطوات حسب رقمها
@@ -64,9 +68,14 @@ struct FocusOneStep: View {
     private var circleDiameter: CGFloat {
         let minDiameter: CGFloat = 320
         let maxDiameter: CGFloat = 380
-        let verticalPadding: CGFloat = 90 // مساحة فوق وتحت المحتوى داخل الدائرة
+        let verticalPadding: CGFloat = 90
+
         let needed = stepContentSize.height + verticalPadding
-        return min(max(minDiameter, needed), maxDiameter)
+
+        return min(
+            max(minDiameter, needed),
+            maxDiameter
+        )
     }
 
     var body: some View {
@@ -95,38 +104,54 @@ struct FocusOneStep: View {
 
                 HStack {
 
+                    // Back
                     Button {
                         dismiss()
                     } label: {
-
                         Image(systemName: "chevron.left")
-                            .font(.title2)
+                            .font(
+                                .system(
+                                    size: 20,
+                                    weight: .medium
+                                )
+                            )
+                            .foregroundStyle(
+                                Color(hex: "75608E")
+                            )
+                            .frame(
+                                width: 32,
+                                height: 32
+                            )
+                            .contentShape(Rectangle())
                     }
-                    .buttonStyle(
-                        PressableIconStyle(
-                            normalColor: .primaryText,
-                            pressedColor: .secondaryButton
-                        )
-                    )
+                    .buttonStyle(.plain)
 
                     Spacer()
 
+                    // Home
                     NavigationLink {
                         MainTabView()
                     } label: {
-
                         Image(systemName: "house")
-                            .font(.system(size: 28))
+                            .font(
+                                .system(
+                                    size: 27,
+                                    weight: .semibold
+                                )
+                            )
+                            .foregroundStyle(
+                                Color(hex: "75608E")
+                            )
+                            .frame(
+                                width: 38,
+                                height: 38
+                            )
+                            .contentShape(Rectangle())
                     }
-                    .buttonStyle(
-                        PressableIconStyle(
-                            normalColor: .primaryText,
-                            pressedColor: .secondaryButton
-                        )
-                    )
+                    .buttonStyle(.plain)
                 }
-                .padding(.horizontal, 25)
-                .padding(.top, 15)
+                .padding(.horizontal, 24)
+                .padding(.top, 10)
 
                 Spacer()
                     .frame(height: 25)
@@ -205,7 +230,7 @@ struct FocusOneStep: View {
                             .foregroundColor(.secondaryText)
                             .multilineTextAlignment(.center)
                         }
-                        .frame(width: 240) // عرض ثابت عشان النص يلف بانتظام، والطول هو اللي يكبّر الدائرة
+                        .frame(width: 240)
                         .background(
                             GeometryReader { geo in
                                 Color.clear
@@ -215,7 +240,9 @@ struct FocusOneStep: View {
                                     )
                             }
                         )
-                        .onPreferenceChange(StepContentSizeKey.self) { size in
+                        .onPreferenceChange(
+                            StepContentSizeKey.self
+                        ) { size in
                             stepContentSize = size
                         }
                     }

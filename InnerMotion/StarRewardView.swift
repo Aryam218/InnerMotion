@@ -29,38 +29,56 @@ struct StarRewardView: View {
 
                 HStack {
 
+                    // Back
                     Button {
                         dismiss()
                     } label: {
 
                         Image(systemName: "chevron.left")
-                            .font(.title2)
+                            .font(
+                                .system(
+                                    size: 20,
+                                    weight: .medium
+                                )
+                            )
+                            .foregroundStyle(
+                                Color(hex: "75608E")
+                            )
+                            .frame(
+                                width: 32,
+                                height: 32
+                            )
+                            .contentShape(Rectangle())
                     }
-                    .buttonStyle(
-                        PressableIconStyle(
-                            normalColor: .primaryText,
-                            pressedColor: .secondaryButton
-                        )
-                    )
+                    .buttonStyle(.plain)
 
                     Spacer()
 
+                    // Home
                     NavigationLink {
                         MainTabView()
                     } label: {
 
                         Image(systemName: "house")
-                            .font(.system(size: 28))
+                            .font(
+                                .system(
+                                    size: 27,
+                                    weight: .semibold
+                                )
+                            )
+                            .foregroundStyle(
+                                Color(hex: "75608E")
+                            )
+                            .frame(
+                                width: 38,
+                                height: 38
+                            )
+                            .contentShape(Rectangle())
                     }
-                    .buttonStyle(
-                        PressableIconStyle(
-                            normalColor: .primaryText,
-                            pressedColor: .secondaryButton
-                        )
-                    )
+                    .buttonStyle(.plain)
                 }
-                .padding(.horizontal, 25)
-                .padding(.top, 15)
+                .padding(.horizontal, 24)
+                .padding(.top, 10)
 
                 Spacer()
             }
@@ -154,17 +172,24 @@ struct StarRewardView: View {
             .padding(.horizontal, 24)
             .padding(.top, 20)
 
-            NavigationLink(destination: MyAchievmentJar(animateStarDrop: true)) {
+            NavigationLink(
+                destination: MyAchievmentJar(
+                    animateStarDrop: true
+                )
+            ) {
                 Text("View My Achievement Jar")
                     .font(.headline)
                     .foregroundColor(.white)
                     .padding(.vertical, 12)
                     .padding(.horizontal, 28)
                     .background(
-                        Color(red: 126/255, green: 106/255, blue: 158/255)
+                        Color(
+                            red: 126/255,
+                            green: 106/255,
+                            blue: 158/255
+                        )
                     )
-                
-                .cornerRadius(25)
+                    .cornerRadius(25)
             }
             .padding(.top, 690)
         }
