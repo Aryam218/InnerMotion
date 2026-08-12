@@ -199,6 +199,7 @@ struct TaskListView: View {
                                     taskCard(task)
                                 }
                                 .buttonStyle(.plain)
+                                .disabled(task.status == "Completed")
                             }
                         }
                     }
@@ -414,19 +415,22 @@ struct TaskListView: View {
 
                 Spacer()
 
-                // يوضح أن الكارد قابل للضغط
-                Image(
-                    systemName: "chevron.right"
-                )
-                .font(
-                    .system(
-                        size: 12,
-                        weight: .semibold
+                // يوضح أن الكارد قابل للضغط (نخفيه للمهام المكتملة)
+                if task.status != "Completed" {
+
+                    Image(
+                        systemName: "chevron.right"
                     )
-                )
-                .foregroundColor(
-                    .gray.opacity(0.7)
-                )
+                    .font(
+                        .system(
+                            size: 12,
+                            weight: .semibold
+                        )
+                    )
+                    .foregroundColor(
+                        .gray.opacity(0.7)
+                    )
+                }
             }
         }
         .frame(

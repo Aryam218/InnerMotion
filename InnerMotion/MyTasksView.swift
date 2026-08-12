@@ -487,6 +487,9 @@ private struct SwipeToDeleteUserTaskCard: View {
         ) {
 
             // MARK: Delete Panel
+            // نخليه يمتد لنفس ارتفاع الكارد تلقائيًا
+            // (maxHeight: .infinity) بدل رقم ثابت،
+            // عشان لو التاسك طويلة ويكبر الكارد، الديليت يكبر معاه
 
             Button {
 
@@ -514,9 +517,11 @@ private struct SwipeToDeleteUserTaskCard: View {
                 }
                 .frame(
                     width:
-                        deleteButtonWidth,
-                    height:
-                        120
+                        deleteButtonWidth
+                )
+                .frame(
+                    maxHeight:
+                        .infinity
                 )
                 .background(
                     Color.black
@@ -565,7 +570,7 @@ private struct SwipeToDeleteUserTaskCard: View {
                                 "pencil"
                         )
                         .font(
-                            .system(size: 16)
+                            .system(size: 22, weight: .medium)
                         )
                         .foregroundStyle(
                             buttonColor

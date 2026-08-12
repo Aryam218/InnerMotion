@@ -4,6 +4,15 @@ import SwiftData
 // ملاحظة: كل الألوان معرّفة بملف Colors.swift
 // لا تضيفين extension Color بهذا الملف
 
+// MARK: - Preference Key لقياس حجم محتوى الخطوة
+
+private struct StepContentSizeKey: PreferenceKey {
+    static var defaultValue: CGSize = .zero
+    static func reduce(value: inout CGSize, nextValue: () -> CGSize) {
+        value = nextValue()
+    }
+}
+
 struct FocusOneStep: View {
 
     @Environment(\.dismiss) private var dismiss
@@ -22,6 +31,9 @@ struct FocusOneStep: View {
 
     // يمنع محاولة تغيير الحالة أكثر من مرة
     @State private var hasMarkedInProgress = false
+
+    // حجم محتوى الخطوة الحالية (يتغير حسب طول النص)
+    @State private var stepContentSize: CGSize = .zero
 
     // ترتيب الخطوات حسب رقمها
     private var orderedSteps: [TaskStep] {
@@ -46,6 +58,15 @@ struct FocusOneStep: View {
         }
 
         return currentStepIndex == orderedSteps.count - 1
+    }
+
+    // قطر الدائرة الديناميكي حسب طول محتوى الخطوة
+    private var circleDiameter: CGFloat {
+        let minDiameter: CGFloat = 320
+        let maxDiameter: CGFloat = 380
+        let verticalPadding: CGFloat = 90 // مساحة فوق وتحت المحتوى داخل الدائرة
+        let needed = stepContentSize.height + verticalPadding
+        return min(max(minDiameter, needed), maxDiameter)
     }
 
     var body: some View {
@@ -139,8 +160,12 @@ struct FocusOneStep: View {
                                     .opacity(0.7)
                             )
                             .frame(
-                                width: 320,
-                                height: 320
+                                width: circleDiameter,
+                                height: circleDiameter
+                            )
+                            .animation(
+                                .easeInOut(duration: 0.25),
+                                value: circleDiameter
                             )
 
                         VStack(spacing: 14) {
@@ -160,7 +185,6 @@ struct FocusOneStep: View {
                                 )
                                 .foregroundColor(.primaryText)
                                 .multilineTextAlignment(.center)
-                                .padding(.horizontal, 40)
 
                             Text("Estimated time")
                                 .font(.system(size: 15))
@@ -180,6 +204,19 @@ struct FocusOneStep: View {
                             )
                             .foregroundColor(.secondaryText)
                             .multilineTextAlignment(.center)
+                        }
+                        .frame(width: 240) // عرض ثابت عشان النص يلف بانتظام، والطول هو اللي يكبّر الدائرة
+                        .background(
+                            GeometryReader { geo in
+                                Color.clear
+                                    .preference(
+                                        key: StepContentSizeKey.self,
+                                        value: geo.size
+                                    )
+                            }
+                        )
+                        .onPreferenceChange(StepContentSizeKey.self) { size in
+                            stepContentSize = size
                         }
                     }
 

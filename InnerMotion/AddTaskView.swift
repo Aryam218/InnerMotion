@@ -86,6 +86,11 @@ struct AddTaskView: View {
         return formatter
     }
 
+    // MARK: - Minimum selectable date (بداية اليوم — يمنع اختيار تاريخ راح)
+    private var minimumSelectableDate: Date {
+        Calendar.current.startOfDay(for: Date())
+    }
+
     var body: some View {
 
         ZStack {
@@ -349,6 +354,9 @@ struct AddTaskView: View {
                             isTaskFieldFocused =
                                 false
 
+                            // نبدأ التاريخ المؤقت من اليوم (أو من التاريخ المختار سابقًا لو موجود)
+                            tempDate = dueDate ?? minimumSelectableDate
+
                             showDatePicker = true
 
                         } label: {
@@ -458,6 +466,9 @@ struct AddTaskView: View {
 
         .navigationBarHidden(true)
 
+        // الزر يضل ثابت تحت — ما يطلع فوق الكيبورد
+        .ignoresSafeArea(.keyboard, edges: .bottom)
+
         // MARK: - Date Picker
 
         .sheet(
@@ -471,6 +482,7 @@ struct AddTaskView: View {
                     "Due date",
                     selection:
                         $tempDate,
+                    in: minimumSelectableDate...,
                     displayedComponents:
                         .date
                 )

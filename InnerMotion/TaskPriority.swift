@@ -124,6 +124,11 @@ struct EditTaskView: View {
         return formatter
     }
 
+    // MARK: - Minimum selectable date (بداية اليوم — يمنع اختيار تاريخ راح)
+    private var minimumSelectableDate: Date {
+        Calendar.current.startOfDay(for: Date())
+    }
+
     var body: some View {
 
         ZStack {
@@ -298,8 +303,9 @@ struct EditTaskView: View {
 
                         Button {
 
+                            // نبدأ التاريخ المؤقت من اليوم (أو من التاريخ المختار سابقًا لو موجود)
                             tempDate =
-                                dueDate ?? Date()
+                                dueDate ?? minimumSelectableDate
 
                             showDatePicker = true
 
@@ -377,6 +383,9 @@ struct EditTaskView: View {
         }
         .navigationBarHidden(true)
 
+        // الزر يضل ثابت تحت — ما يطلع فوق الكيبورد
+        .ignoresSafeArea(.keyboard, edges: .bottom)
+
         // Date Picker
         .sheet(
             isPresented: $showDatePicker
@@ -387,6 +396,7 @@ struct EditTaskView: View {
                 DatePicker(
                     "Due date",
                     selection: $tempDate,
+                    in: minimumSelectableDate...,
                     displayedComponents: .date
                 )
                 .datePickerStyle(.graphical)
