@@ -30,8 +30,11 @@ struct MyTasksView: View {
         }
     }
 
+    // MARK: - Navigation State
+
     @State private var isContinuePressed = false
     @State private var navigateHome = false
+    @State private var goToPlanYourDay = false
 
     // MARK: - Colors
 
@@ -47,10 +50,18 @@ struct MyTasksView: View {
         blue: 0.416
     )
 
+    // اللون الطبيعي للزر
     private let buttonColor = Color(
         red: 0.459,
         green: 0.376,
         blue: 0.557
+    )
+
+    // نفس لون الضغط المستخدم في Start First Step
+    private let pressedButtonColor = Color(
+        red: 0.337,
+        green: 0.239,
+        blue: 0.416
     )
 
     private let pageBackground = Color(
@@ -91,23 +102,25 @@ struct MyTasksView: View {
 
                         } label: {
 
-                            Image(systemName: "chevron.left")
-                                .font(
-                                    .system(
-                                        size: 20,
-                                        weight: .medium
-                                    )
+                            Image(
+                                systemName: "chevron.left"
+                            )
+                            .font(
+                                .system(
+                                    size: 20,
+                                    weight: .medium
                                 )
-                                .foregroundStyle(
-                                    Color(hex: "75608E")
-                                )
-                                .frame(
-                                    width: 32,
-                                    height: 32
-                                )
-                                .contentShape(
-                                    Rectangle()
-                                )
+                            )
+                            .foregroundStyle(
+                                Color(hex: "75608E")
+                            )
+                            .frame(
+                                width: 32,
+                                height: 32
+                            )
+                            .contentShape(
+                                Rectangle()
+                            )
                         }
                         .buttonStyle(.plain)
 
@@ -121,23 +134,25 @@ struct MyTasksView: View {
 
                         } label: {
 
-                            Image(systemName: "house")
-                                .font(
-                                    .system(
-                                        size: 27,
-                                        weight: .semibold
-                                    )
+                            Image(
+                                systemName: "house"
+                            )
+                            .font(
+                                .system(
+                                    size: 27,
+                                    weight: .semibold
                                 )
-                                .foregroundStyle(
-                                    Color(hex: "75608E")
-                                )
-                                .frame(
-                                    width: 38,
-                                    height: 38
-                                )
-                                .contentShape(
-                                    Rectangle()
-                                )
+                            )
+                            .foregroundStyle(
+                                Color(hex: "75608E")
+                            )
+                            .frame(
+                                width: 38,
+                                height: 38
+                            )
+                            .contentShape(
+                                Rectangle()
+                            )
                         }
                         .buttonStyle(.plain)
                     }
@@ -190,30 +205,31 @@ struct MyTasksView: View {
 
                         // MARK: Continue
 
-                        NavigationLink(
-                            destination:
-                                PlanYourDayView(
-                                    sessionID: sessionID
-                                )
-                        ) {
+                        Button {
+
+                            if !tasks.isEmpty {
+
+                                goToPlanYourDay = true
+                            }
+
+                        } label: {
 
                             Text("Continue")
                                 .font(
                                     Font.title3.bold()
                                 )
-                                .foregroundStyle(
-                                    isContinuePressed
-                                    ? buttonColor
-                                    : .white
-                                )
+                                .foregroundStyle(.white)
                                 .frame(
                                     maxWidth: .infinity
                                 )
                                 .padding(.vertical, 18)
                                 .background(
+
                                     isContinuePressed
-                                    ? Color.white
+
+                                    ? pressedButtonColor
                                     : buttonColor
+
                                 )
                                 .clipShape(
                                     RoundedRectangle(
@@ -222,10 +238,16 @@ struct MyTasksView: View {
                                 )
                         }
                         .buttonStyle(.plain)
-                        .disabled(tasks.isEmpty)
-                        .opacity(
-                            tasks.isEmpty ? 0.55 : 1
+                        .disabled(
+                            tasks.isEmpty
                         )
+                        .opacity(
+                            tasks.isEmpty
+                            ? 0.55
+                            : 1
+                        )
+
+                        // نفس طريقة Start First Step
                         .simultaneousGesture(
 
                             DragGesture(
@@ -233,13 +255,26 @@ struct MyTasksView: View {
                             )
                             .onChanged { _ in
 
-                                isContinuePressed = true
+                                if !tasks.isEmpty {
+
+                                    isContinuePressed = true
+                                }
                             }
                             .onEnded { _ in
 
                                 isContinuePressed = false
                             }
                         )
+
+                        .navigationDestination(
+                            isPresented:
+                                $goToPlanYourDay
+                        ) {
+
+                            PlanYourDayView(
+                                sessionID: sessionID
+                            )
+                        }
 
                         // MARK: Add Another Task
 
@@ -386,7 +421,9 @@ private struct SwipeToDeleteUserTaskCard: View {
 
         formatter.dateFormat = "d MMM yyyy"
 
-        return formatter.string(from: dueDate)
+        return formatter.string(
+            from: dueDate
+        )
     }
 
     var body: some View {
@@ -536,8 +573,8 @@ private struct SwipeToDeleteUserTaskCard: View {
 
                             offset = min(
                                 max(
-                                    deleteButtonWidth +
-                                    translation,
+                                    deleteButtonWidth
+                                    + translation,
                                     0
                                 ),
                                 deleteButtonWidth
@@ -579,6 +616,7 @@ private struct SwipeToDeleteUserTaskCard: View {
 
                                     offset =
                                         deleteButtonWidth
+
                                     isSwipeOpen = true
                                 }
 
@@ -588,6 +626,7 @@ private struct SwipeToDeleteUserTaskCard: View {
 
                                     offset =
                                         deleteButtonWidth
+
                                     isSwipeOpen = true
 
                                 } else {

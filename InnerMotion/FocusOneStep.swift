@@ -22,31 +22,30 @@ struct FocusOneStep: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
 
-    // المهمة الحقيقية الناتجة من الـ AI
     let task: PlannedTask
 
-    // رقم الخطوة الحالية
     @State private var currentStepIndex = 0
 
-    // حالات التنقل والـ Popup
     @State private var showCompletionPopup = false
     @State private var goToBreakTime = false
     @State private var goToStarReward = false
 
-    // يمنع محاولة تغيير الحالة أكثر من مرة
     @State private var hasMarkedInProgress = false
 
-    // حجم محتوى الخطوة الحالية
     @State private var stepContentSize: CGSize = .zero
 
-    // ترتيب الخطوات حسب رقمها
+    // MARK: - Button Press States
+
+    @State private var isDonePressed = false
+    @State private var isContinuePressed = false
+    @State private var isBreakPressed = false
+
     private var orderedSteps: [TaskStep] {
         task.steps.sorted {
             $0.order < $1.order
         }
     }
 
-    // الخطوة الحالية
     private var currentStep: TaskStep? {
         guard orderedSteps.indices.contains(currentStepIndex) else {
             return nil
@@ -55,7 +54,6 @@ struct FocusOneStep: View {
         return orderedSteps[currentStepIndex]
     }
 
-    // هل الخطوة الحالية هي آخر خطوة؟
     private var isLastStep: Bool {
         guard !orderedSteps.isEmpty else {
             return false
@@ -64,7 +62,6 @@ struct FocusOneStep: View {
         return currentStepIndex == orderedSteps.count - 1
     }
 
-    // قطر الدائرة الديناميكي حسب طول محتوى الخطوة
     private var circleDiameter: CGFloat {
         let minDiameter: CGFloat = 320
         let maxDiameter: CGFloat = 380
@@ -87,7 +84,6 @@ struct FocusOneStep: View {
             Color.backgroundColor
                 .ignoresSafeArea()
 
-            // صورة الخلفية - الجبال
             VStack {
                 Spacer()
 
@@ -104,10 +100,10 @@ struct FocusOneStep: View {
 
                 HStack {
 
-                    // Back
                     Button {
                         dismiss()
                     } label: {
+
                         Image(systemName: "chevron.left")
                             .font(
                                 .system(
@@ -128,10 +124,10 @@ struct FocusOneStep: View {
 
                     Spacer()
 
-                    // Home
                     NavigationLink {
                         MainTabView()
                     } label: {
+
                         Image(systemName: "house")
                             .font(
                                 .system(
@@ -259,7 +255,8 @@ struct FocusOneStep: View {
 
                 HStack(spacing: 55) {
 
-                    // Done
+                    // MARK: Done
+
                     VStack(spacing: 10) {
 
                         Button {
@@ -275,17 +272,42 @@ struct FocusOneStep: View {
                                         weight: .bold
                                     )
                                 )
+                                .foregroundStyle(.white)
                                 .frame(
                                     width: 90,
                                     height: 90
                                 )
+                                .background(
+                                    Circle()
+                                        .fill(
+                                            isDonePressed
+                                            ? Color(
+                                                red: 0.337,
+                                                green: 0.239,
+                                                blue: 0.416
+                                            )
+                                            : Color.primaryButton
+                                        )
+                                )
                         }
-                        .buttonStyle(
-                            PressableCircleIconStyle(
-                                fillColor: .primaryButton
-                            )
-                        )
+                        .buttonStyle(.plain)
                         .disabled(currentStep == nil)
+                        .simultaneousGesture(
+
+                            DragGesture(
+                                minimumDistance: 0
+                            )
+                            .onChanged { _ in
+
+                                if currentStep != nil {
+                                    isDonePressed = true
+                                }
+                            }
+                            .onEnded { _ in
+
+                                isDonePressed = false
+                            }
+                        )
 
                         Text("Done")
                             .font(
@@ -297,7 +319,8 @@ struct FocusOneStep: View {
                             .foregroundColor(.primaryText)
                     }
 
-                    // Take a Break
+                    // MARK: Take a Break
+
                     VStack(spacing: 10) {
 
                         Button {
@@ -309,16 +332,41 @@ struct FocusOneStep: View {
                             Image(
                                 systemName: "cup.and.saucer.fill"
                             )
-                            .font(.system(size: 28))
+                            .font(
+                                .system(size: 28)
+                            )
+                            .foregroundStyle(.white)
                             .frame(
                                 width: 90,
                                 height: 90
                             )
-                        }
-                        .buttonStyle(
-                            PressableCircleIconStyle(
-                                fillColor: .secondaryButton
+                            .background(
+                                Circle()
+                                    .fill(
+                                        isBreakPressed
+                                        ? Color(
+                                            red: 0.337,
+                                            green: 0.239,
+                                            blue: 0.416
+                                        )
+                                        : Color.secondaryButton
+                                    )
                             )
+                        }
+                        .buttonStyle(.plain)
+                        .simultaneousGesture(
+
+                            DragGesture(
+                                minimumDistance: 0
+                            )
+                            .onChanged { _ in
+
+                                isBreakPressed = true
+                            }
+                            .onEnded { _ in
+
+                                isBreakPressed = false
+                            }
                         )
 
                         Text("Take a Break")
@@ -360,7 +408,6 @@ struct FocusOneStep: View {
 
             if showCompletionPopup {
 
-                // يمنع الضغط على الخلفية
                 Color.black
                     .opacity(0.001)
                     .ignoresSafeArea()
@@ -405,6 +452,8 @@ struct FocusOneStep: View {
                     .foregroundColor(.secondaryText)
                     .multilineTextAlignment(.center)
 
+                    // MARK: - Continue
+
                     Button {
 
                         continueAfterCompletion()
@@ -418,14 +467,40 @@ struct FocusOneStep: View {
                                     weight: .medium
                                 )
                             )
-                            .frame(maxWidth: .infinity)
+                            .foregroundStyle(.white)
+                            .frame(
+                                maxWidth: .infinity
+                            )
                             .frame(height: 55)
+                            .background(
+                                isContinuePressed
+                                ? Color(
+                                    red: 0.337,
+                                    green: 0.239,
+                                    blue: 0.416
+                                )
+                                : Color.primaryButton
+                            )
+                            .clipShape(
+                                RoundedRectangle(
+                                    cornerRadius: 27.5
+                                )
+                            )
                     }
-                    .buttonStyle(
-                        PressableCapsuleStyle(
-                            fillColor: .primaryButton,
-                            cornerRadius: 27.5
+                    .buttonStyle(.plain)
+                    .simultaneousGesture(
+
+                        DragGesture(
+                            minimumDistance: 0
                         )
+                        .onChanged { _ in
+
+                            isContinuePressed = true
+                        }
+                        .onEnded { _ in
+
+                            isContinuePressed = false
+                        }
                     )
                     .padding(.top, 8)
                 }
@@ -451,14 +526,10 @@ struct FocusOneStep: View {
             }
         }
 
-        // MARK: - On Appear
-
         .onAppear {
 
-            // يرجع لأول خطوة غير مكتملة
             moveToFirstIncompleteStep()
 
-            // أول ما يبدأ المهمة تتحول إلى In Progress
             markTaskAsInProgress()
         }
 
@@ -472,7 +543,6 @@ struct FocusOneStep: View {
             for: .navigationBar
         )
 
-        // بعد إنهاء جميع الخطوات
         .navigationDestination(
             isPresented: $goToStarReward
         ) {
@@ -488,7 +558,6 @@ struct FocusOneStep: View {
             return
         }
 
-        // نحفظ أن هذه الخطوة اكتملت
         currentStep.isCompleted = true
 
         do {
@@ -499,7 +568,6 @@ struct FocusOneStep: View {
                 "Completed step \(currentStep.order): \(currentStep.text)"
             )
 
-            // يظهر Nice Work
             showCompletionPopup = true
 
         } catch {
@@ -516,15 +584,12 @@ struct FocusOneStep: View {
 
         showCompletionPopup = false
 
-        // إذا كانت آخر خطوة
         if isLastStep {
 
-            // يروح إلى صفحة النجمة
             goToStarReward = true
 
         } else {
 
-            // يروح للخطوة التالية
             withAnimation(
                 .easeInOut(duration: 0.3)
             ) {
@@ -542,7 +607,6 @@ struct FocusOneStep: View {
             return
         }
 
-        // يبحث عن أول خطوة لم تكتمل
         if let firstIncompleteIndex =
             orderedSteps.firstIndex(
                 where: {
@@ -555,8 +619,6 @@ struct FocusOneStep: View {
 
         } else {
 
-            // إذا كانت كل الخطوات مكتملة
-            // يعرض آخر خطوة
             currentStepIndex =
                 max(
                     orderedSteps.count - 1,
@@ -593,18 +655,18 @@ struct FocusOneStep: View {
                 )
 
             guard let originalTask =
-                    userTasks.first(
-                        where: {
+                userTasks.first(
+                    where: {
 
-                            $0.title
-                                .trimmingCharacters(
-                                    in: .whitespacesAndNewlines
-                                )
-                                .lowercased()
-                            ==
-                            normalizedTitle
-                        }
-                    )
+                        $0.title
+                            .trimmingCharacters(
+                                in: .whitespacesAndNewlines
+                            )
+                            .lowercased()
+                        ==
+                        normalizedTitle
+                    }
+                )
             else {
 
                 print(
@@ -614,8 +676,6 @@ struct FocusOneStep: View {
                 return
             }
 
-            // فقط المهمة الجديدة تتحول إلى In Progress
-            // لو كانت Completed ما نرجع نغيرها
             if originalTask.status == "Not Started" {
 
                 originalTask.status =
@@ -650,7 +710,6 @@ struct FocusOneStep: View {
     }
 }
 
-
 // MARK: - Rounded Corner
 
 struct RoundedCorner: Shape {
@@ -674,7 +733,6 @@ struct RoundedCorner: Shape {
         return Path(path.cgPath)
     }
 }
-
 
 // MARK: - Preview
 
@@ -708,6 +766,7 @@ struct RoundedCorner: Shape {
         title: "Study for math exam",
         priority: "High",
         order: 1,
+        planningSessionID: UUID(),
         steps: [
             step1,
             step2,

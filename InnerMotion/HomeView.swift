@@ -40,7 +40,6 @@ struct HomeView: View {
 
     // MARK: - Pending Planning Session
 
-    // أحدث جلسة فيها Tasks لم يتم تخطيطها بالـ AI حتى الآن
     private var pendingPlanningSessionID: UUID? {
 
         userTasks.first {
@@ -51,7 +50,8 @@ struct HomeView: View {
         }?.planningSessionID
     }
 
-    // مهام الجلسة غير المكتملة فقط
+    // MARK: - Pending Planning Tasks
+
     private var pendingPlanningTasks: [UserTask] {
 
         guard let pendingPlanningSessionID else {
@@ -109,7 +109,8 @@ struct HomeView: View {
             return nil
         }
 
-        // نحاول أولًا المطابقة باستخدام Session ID
+        // أولًا المطابقة باستخدام Session ID
+
         if let sessionID =
             currentUserTask.planningSessionID {
 
@@ -143,6 +144,7 @@ struct HomeView: View {
         }
 
         // Fallback للمهام القديمة
+
         let normalizedTitle =
             currentUserTask.title
                 .trimmingCharacters(
@@ -231,7 +233,7 @@ struct HomeView: View {
 
         ZStack(alignment: .bottom) {
 
-            // Background
+            // MARK: - Background
 
             Color(
                 red: 0.992,
@@ -359,6 +361,7 @@ struct HomeView: View {
                         )
 
                         // MARK: Feature 1
+                        // بدون تأثير ضغط
 
                         NavigationLink(
                             destination:
@@ -472,8 +475,10 @@ struct HomeView: View {
                             )
                             .cornerRadius(22)
                         }
+                        .buttonStyle(.plain)
 
                         // MARK: Feature 2
+                        // بدون تأثير ضغط
 
                         HStack(spacing: 14) {
 
@@ -587,6 +592,7 @@ struct HomeView: View {
                             showSuggestionCategories =
                                 true
                         }
+
                     }
                     .padding(
                         .horizontal,
@@ -648,7 +654,7 @@ struct HomeView: View {
                                         width: 58,
                                         height: 58
                                     )
-                                    .overlay(
+                                    .overlay {
 
                                         Image(
                                             systemName:
@@ -666,7 +672,7 @@ struct HomeView: View {
                                                 blue: 0.55
                                             )
                                         )
-                                    )
+                                    }
 
                                     VStack(
                                         alignment: .leading,
@@ -714,6 +720,8 @@ struct HomeView: View {
                                     )
                                 }
 
+                                // MARK: Continue Planning Button
+
                                 Button {
 
                                     goToPendingPlanning =
@@ -746,7 +754,7 @@ struct HomeView: View {
                                             )
                                         )
                                     }
-                                    .foregroundColor(
+                                    .foregroundStyle(
                                         .white
                                     )
                                     .padding(
@@ -757,15 +765,17 @@ struct HomeView: View {
                                         .horizontal,
                                         16
                                     )
-                                    .background(
-                                        Color(
-                                            red: 0.45,
-                                            green: 0.38,
-                                            blue: 0.58
-                                        )
-                                    )
-                                    .cornerRadius(18)
                                 }
+                                .buttonStyle(
+                                    ContinueButtonStyle(
+                                        color:
+                                            Color(
+                                                red: 0.45,
+                                                green: 0.38,
+                                                blue: 0.58
+                                            )
+                                    )
+                                )
                             }
                             .padding(18)
                             .frame(
@@ -841,7 +851,7 @@ struct HomeView: View {
                                         width: 58,
                                         height: 58
                                     )
-                                    .overlay(
+                                    .overlay {
 
                                         Image(
                                             systemName: "book"
@@ -858,7 +868,7 @@ struct HomeView: View {
                                                 blue: 0.55
                                             )
                                         )
-                                    )
+                                    }
 
                                     VStack(
                                         alignment: .leading,
@@ -963,6 +973,8 @@ struct HomeView: View {
                                     )
                                 }
 
+                                // MARK: Continue Task Button
+
                                 Button {
 
                                     goToFocusTask =
@@ -995,7 +1007,7 @@ struct HomeView: View {
                                             )
                                         )
                                     }
-                                    .foregroundColor(
+                                    .foregroundStyle(
                                         .white
                                     )
                                     .padding(
@@ -1006,15 +1018,17 @@ struct HomeView: View {
                                         .horizontal,
                                         16
                                     )
-                                    .background(
-                                        Color(
-                                            red: 0.45,
-                                            green: 0.38,
-                                            blue: 0.58
-                                        )
-                                    )
-                                    .cornerRadius(18)
                                 }
+                                .buttonStyle(
+                                    ContinueButtonStyle(
+                                        color:
+                                            Color(
+                                                red: 0.45,
+                                                green: 0.38,
+                                                blue: 0.58
+                                            )
+                                    )
+                                )
                             }
                             .padding(18)
                             .frame(
@@ -1126,15 +1140,12 @@ struct HomeView: View {
         }
     }
 
-
     // MARK: - Notification Button
 
     private func handleNotificationButton() {
 
         Task {
 
-            // إذا الإشعارات مفعلة حاليًا
-            // ضغطة ثانية توقف إشعارات التطبيق
             if notificationsEnabled {
 
                 NotificationManager
@@ -1153,13 +1164,11 @@ struct HomeView: View {
                 return
             }
 
-            // نشوف صلاحية iOS الحالية
             let status =
                 await NotificationManager
                     .shared
                     .authorizationStatus()
 
-            // المستخدم سبق ورفض الإذن
             if status == .denied {
 
                 await MainActor.run {
@@ -1200,7 +1209,6 @@ struct HomeView: View {
         }
     }
 
-
     // MARK: - Refresh Notification State
 
     private func refreshNotificationState() {
@@ -1224,7 +1232,6 @@ struct HomeView: View {
                 notificationsAuthorized =
                     authorized
 
-                // إذا المستخدم قفلها من Settings
                 if !authorized {
 
                     notificationsEnabled =
@@ -1232,8 +1239,6 @@ struct HomeView: View {
                 }
             }
 
-            // إذا الإشعارات مفعلة
-            // نحدث Reminder حسب وجود مهام
             if authorized &&
                 notificationsEnabled {
 
@@ -1245,6 +1250,42 @@ struct HomeView: View {
                     )
             }
         }
+    }
+}
+
+
+// MARK: - Continue Button Style
+
+struct ContinueButtonStyle: ButtonStyle {
+
+    let color: Color
+
+    func makeBody(
+        configuration: Configuration
+    ) -> some View {
+
+        configuration.label
+            .background(
+                Capsule()
+                    .fill(
+                        configuration.isPressed
+                        ? Color(
+                            red: 0.337,
+                            green: 0.239,
+                            blue: 0.416
+                        )
+                        : color
+                    )
+            )
+            .scaleEffect(
+                configuration.isPressed
+                ? 0.97
+                : 1
+            )
+            .animation(
+                .easeOut(duration: 0.1),
+                value: configuration.isPressed
+            )
     }
 }
 

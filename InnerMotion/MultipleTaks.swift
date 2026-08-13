@@ -16,11 +16,16 @@ struct MultipleTaks: View {
 
     @State private var goToSelectedTask = false
 
+    // MARK: - Start Task Press State
+
+    @State private var isStartTaskPressed = false
+
     private var isTaskSelected: Bool {
         selectedTaskIndex != nil
     }
 
     private var selectedTask: PlannedTask? {
+
         guard let selectedTaskIndex,
               tasks.indices.contains(selectedTaskIndex)
         else {
@@ -127,7 +132,9 @@ struct MultipleTaks: View {
 
                 // MARK: - Tasks
 
-                ScrollView(showsIndicators: false) {
+                ScrollView(
+                    showsIndicators: false
+                ) {
 
                     VStack(spacing: 18) {
 
@@ -152,24 +159,58 @@ struct MultipleTaks: View {
                 Button {
 
                     if selectedTask != nil {
+
                         goToSelectedTask = true
                     }
 
                 } label: {
 
                     Text("Start Task")
-                        .font(.title2.bold())
-                        .frame(maxWidth: .infinity)
+                        .font(
+                            .title2.bold()
+                        )
+                        .foregroundStyle(.white)
+                        .frame(
+                            maxWidth: .infinity
+                        )
                         .frame(height: 58)
+                        .background(
+
+                            isStartTaskPressed
+
+                            ? Color(
+                                red: 0.337,
+                                green: 0.239,
+                                blue: 0.416
+                            )
+
+                            : Color.primaryButton
+                        )
+                        .clipShape(
+                            Capsule()
+                        )
                 }
-                .buttonStyle(
-                    PressableCapsuleStyle(
-                        fillColor: .primaryButton
-                    )
-                )
+                .buttonStyle(.plain)
                 .disabled(!isTaskSelected)
                 .opacity(
                     isTaskSelected ? 1 : 0.55
+                )
+                .simultaneousGesture(
+
+                    DragGesture(
+                        minimumDistance: 0
+                    )
+                    .onChanged { _ in
+
+                        if isTaskSelected {
+
+                            isStartTaskPressed = true
+                        }
+                    }
+                    .onEnded { _ in
+
+                        isStartTaskPressed = false
+                    }
                 )
                 .padding(.horizontal, 30)
                 .padding(.bottom, 20)
@@ -179,7 +220,8 @@ struct MultipleTaks: View {
         // MARK: - Selected Task Navigation
 
         .navigationDestination(
-            isPresented: $goToSelectedTask
+            isPresented:
+                $goToSelectedTask
         ) {
 
             if let selectedTask {
@@ -187,6 +229,7 @@ struct MultipleTaks: View {
                 PlanOneTask(
                     task: selectedTask,
                     onBack: {
+
                         goToSelectedTask = false
                     }
                 )
@@ -211,6 +254,7 @@ struct PlannedTaskCard: View {
     @Binding var selectedTaskIndex: Int?
 
     private var isSelected: Bool {
+
         selectedTaskIndex == index
     }
 

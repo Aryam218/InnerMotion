@@ -17,7 +17,6 @@ struct SuggestionResultView: View {
     let selectedTime: AvailableTime?
     let selectedLocation: UserLocation?
 
-
     // MARK: - Environment
 
     @Environment(\.dismiss)
@@ -25,7 +24,6 @@ struct SuggestionResultView: View {
 
     @Environment(\.modelContext)
     private var modelContext
-
 
     // MARK: - Previous Feedback
 
@@ -35,18 +33,15 @@ struct SuggestionResultView: View {
     )
     private var suggestionHistory: [SuggestionActivity]
 
-
     // MARK: - AI Result
 
     @State private var generatedSuggestion:
         GeneratedSuggestion?
 
-
     // MARK: - Previous Suggestions In Current Session
 
     @State private var previousSuggestions:
         [String] = []
-
 
     // MARK: - Loading / Error
 
@@ -56,7 +51,6 @@ struct SuggestionResultView: View {
     @State private var errorMessage:
         String?
 
-
     // MARK: - Navigation
 
     @State private var goToFeedback =
@@ -65,11 +59,18 @@ struct SuggestionResultView: View {
     @State private var startedActivity:
         SuggestionActivity?
 
+    // MARK: - Button Press States
 
-    // يمنع التوليد الأول من التشغيل أكثر من مرة
-    @State private var hasGeneratedInitialSuggestion =
+    @State private var isStartPressed =
         false
 
+    @State private var isAnotherIdeaPressed =
+        false
+
+    // يمنع التوليد الأول من التشغيل أكثر من مرة
+
+    @State private var hasGeneratedInitialSuggestion =
+        false
 
     var body: some View {
 
@@ -79,7 +80,6 @@ struct SuggestionResultView: View {
 
             Color(hex: "FFF7F1")
                 .ignoresSafeArea()
-
 
             // MARK: - Scrollable Content
 
@@ -91,11 +91,11 @@ struct SuggestionResultView: View {
                 VStack(spacing: 0) {
 
                     // مساحة للهيدر الثابت
+
                     Color.clear
                         .frame(
                             height: 58
                         )
-
 
                     // MARK: - Title
 
@@ -126,7 +126,6 @@ struct SuggestionResultView: View {
                         24
                     )
 
-
                     // MARK: - Fixed Image
 
                     Image(
@@ -148,7 +147,6 @@ struct SuggestionResultView: View {
                         70
                     )
 
-
                     // MARK: - Suggestion Area
 
                     Group {
@@ -164,7 +162,6 @@ struct SuggestionResultView: View {
                                     .tint(
                                         Color(hex: "75608E")
                                     )
-
 
                                 Text(
                                     "Finding something for you..."
@@ -191,7 +188,6 @@ struct SuggestionResultView: View {
                                     Color(hex: "F5F0F0")
                                 )
                             )
-
 
                         } else if let suggestion =
                                     generatedSuggestion {
@@ -221,7 +217,6 @@ struct SuggestionResultView: View {
                                     vertical: true
                                 )
 
-
                                 HStack(
                                     spacing: 20
                                 ) {
@@ -246,7 +241,6 @@ struct SuggestionResultView: View {
                                                     "7049DD"
                                             )
                                         )
-
 
                                         Text(
                                             "\(suggestion.estimatedMinutes) min"
@@ -281,7 +275,6 @@ struct SuggestionResultView: View {
                                             )
                                     )
 
-
                                     // MARK: Difficulty
 
                                     HStack(spacing: 7) {
@@ -302,7 +295,6 @@ struct SuggestionResultView: View {
                                                     "7049DD"
                                             )
                                         )
-
 
                                         Text(
                                             suggestion.difficulty
@@ -354,7 +346,6 @@ struct SuggestionResultView: View {
                                 )
                             )
 
-
                         } else {
 
                             // MARK: Error / Empty State
@@ -378,7 +369,6 @@ struct SuggestionResultView: View {
                                     .multilineTextAlignment(
                                         .center
                                     )
-
 
                                     Button {
 
@@ -436,7 +426,6 @@ struct SuggestionResultView: View {
                         50
                     )
 
-
                     // MARK: - Buttons
 
                     VStack(spacing: 10) {
@@ -466,11 +455,20 @@ struct SuggestionResultView: View {
                                 height: 50
                             )
                             .background(
+
                                 Capsule()
                                     .fill(
-                                        Color(
-                                            hex:
-                                                "75608E"
+
+                                        isStartPressed
+
+                                        ? Color(
+                                            red: 0.337,
+                                            green: 0.239,
+                                            blue: 0.416
+                                        )
+
+                                        : Color(
+                                            hex: "75608E"
                                         )
                                     )
                             )
@@ -488,7 +486,27 @@ struct SuggestionResultView: View {
                             ? 0.55
                             : 1
                         )
+                        .simultaneousGesture(
 
+                            DragGesture(
+                                minimumDistance: 0
+                            )
+                            .onChanged { _ in
+
+                                if generatedSuggestion != nil
+                                    &&
+                                    !isGenerating {
+
+                                    isStartPressed =
+                                        true
+                                }
+                            }
+                            .onEnded { _ in
+
+                                isStartPressed =
+                                    false
+                            }
+                        )
 
                         // MARK: Another Idea
 
@@ -534,11 +552,20 @@ struct SuggestionResultView: View {
                                 height: 50
                             )
                             .background(
+
                                 Capsule()
                                     .fill(
-                                        Color(
-                                            hex:
-                                                "A897BD"
+
+                                        isAnotherIdeaPressed
+
+                                        ? Color(
+                                            red: 0.337,
+                                            green: 0.239,
+                                            blue: 0.416
+                                        )
+
+                                        : Color(
+                                            hex: "A897BD"
                                         )
                                     )
                             )
@@ -556,6 +583,27 @@ struct SuggestionResultView: View {
                             ? 0.55
                             : 1
                         )
+                        .simultaneousGesture(
+
+                            DragGesture(
+                                minimumDistance: 0
+                            )
+                            .onChanged { _ in
+
+                                if generatedSuggestion != nil
+                                    &&
+                                    !isGenerating {
+
+                                    isAnotherIdeaPressed =
+                                        true
+                                }
+                            }
+                            .onEnded { _ in
+
+                                isAnotherIdeaPressed =
+                                    false
+                            }
+                        )
                     }
                     .padding(
                         .top,
@@ -570,7 +618,6 @@ struct SuggestionResultView: View {
                     maxWidth: .infinity
                 )
             }
-
 
             // MARK: - Fixed Back and Home
 
@@ -605,9 +652,7 @@ struct SuggestionResultView: View {
                 }
                 .buttonStyle(.plain)
 
-
                 Spacer()
-
 
                 NavigationLink {
 
@@ -656,7 +701,6 @@ struct SuggestionResultView: View {
             .zIndex(10)
         }
 
-
         // MARK: - Generate First Suggestion
 
         .task {
@@ -668,17 +712,14 @@ struct SuggestionResultView: View {
                 return
             }
 
-
             hasGeneratedInitialSuggestion =
                 true
-
 
             await generateSuggestion(
                 isAnotherIdea:
                     false
             )
         }
-
 
         // MARK: - Feedback Navigation
 
@@ -696,13 +737,11 @@ struct SuggestionResultView: View {
             }
         }
 
-
         .toolbar(
             .hidden,
             for: .navigationBar
         )
     }
-
 
     // MARK: - Generate Suggestion
 
@@ -724,12 +763,10 @@ struct SuggestionResultView: View {
             return
         }
 
-
         guard !isGenerating else {
 
             return
         }
-
 
         // MARK: - Save Current Suggestion Before Another Idea
 
@@ -744,13 +781,11 @@ struct SuggestionResultView: View {
                             .whitespacesAndNewlines
                     )
 
-
             if !currentText.isEmpty {
 
                 let normalizedCurrent =
                     currentText
                         .lowercased()
-
 
                 let alreadyStored =
                     previousSuggestions
@@ -767,7 +802,6 @@ struct SuggestionResultView: View {
                             normalizedCurrent
                         }
 
-
                 if !alreadyStored {
 
                     previousSuggestions
@@ -777,17 +811,11 @@ struct SuggestionResultView: View {
                 }
             }
 
-
-            // مهم:
             // نخفي الاقتراح القديم أثناء طلب فكرة جديدة.
-            //
-            // إذا فشل الـ AI بسبب duplicateSuggestion
-            // لن يبقى الاقتراح القديم ظاهرًا وكأنه تولّد مرة ثانية.
 
             generatedSuggestion =
                 nil
         }
-
 
         // MARK: - Start Loading
 
@@ -796,7 +824,6 @@ struct SuggestionResultView: View {
 
         errorMessage =
             nil
-
 
         do {
 
@@ -825,12 +852,10 @@ struct SuggestionResultView: View {
                             suggestionHistory
                     )
 
-
             // MARK: - New Successful Suggestion
 
             generatedSuggestion =
                 suggestion
-
 
             print(
                 """
@@ -839,7 +864,6 @@ struct SuggestionResultView: View {
                 \(suggestion.activity)
                 """
             )
-
 
         } catch {
 
@@ -850,26 +874,16 @@ struct SuggestionResultView: View {
                 """
             )
 
-
-            // مهم:
-            // نخلي generatedSuggestion = nil
-            // حتى تظهر رسالة الخطأ بدل الاقتراح القديم.
-
             generatedSuggestion =
                 nil
-
 
             errorMessage =
                 "We couldn’t find a different suggestion right now. Please try again."
         }
 
-
-        // MARK: - Stop Loading
-
         isGenerating =
             false
     }
-
 
     // MARK: - Start Activity
 
@@ -889,7 +903,6 @@ struct SuggestionResultView: View {
 
             return
         }
-
 
         // MARK: Save Chosen Activity
 
@@ -927,36 +940,29 @@ struct SuggestionResultView: View {
                     nil
             )
 
-
         modelContext.insert(
             activity
         )
-
 
         do {
 
             try modelContext.save()
 
-
             print(
                 "Suggestion activity saved: \(suggestion.activity)"
             )
 
-
             startedActivity =
                 activity
 
-
             goToFeedback =
                 true
-
 
         } catch {
 
             print(
                 "Failed to save suggestion activity: \(error)"
             )
-
 
             errorMessage =
                 "We couldn’t save this activity. Please try again."

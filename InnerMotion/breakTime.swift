@@ -7,6 +7,10 @@ struct breakTime: View {
 
     @Environment(\.dismiss) private var dismiss
 
+    // MARK: - Button Press State
+
+    @State private var isBackPressed = false
+
     var body: some View {
 
         ZStack {
@@ -132,18 +136,43 @@ struct breakTime: View {
                                 weight: .medium
                             )
                         )
+                        .foregroundStyle(.white)
                         .frame(
                             maxWidth: .infinity
                         )
                         .frame(
                             height: 58
                         )
+                        .background(
+
+                            isBackPressed
+
+                            ? Color(
+                                red: 0.337,
+                                green: 0.239,
+                                blue: 0.416
+                            )
+
+                            : Color.primaryButton
+                        )
+                        .clipShape(
+                            Capsule()
+                        )
                 }
-                .buttonStyle(
-                    PressableCapsuleStyle(
-                        fillColor: .primaryButton,
-                        cornerRadius: 29
+                .buttonStyle(.plain)
+                .simultaneousGesture(
+
+                    DragGesture(
+                        minimumDistance: 0
                     )
+                    .onChanged { _ in
+
+                        isBackPressed = true
+                    }
+                    .onEnded { _ in
+
+                        isBackPressed = false
+                    }
                 )
                 .padding(
                     .horizontal,

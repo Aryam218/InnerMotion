@@ -13,6 +13,10 @@ struct StarRewardView: View {
 
     @State private var hasMarkedCompleted = false
 
+    // MARK: - Button Press State
+
+    @State private var isJarPressed = false
+
     var body: some View {
         ZStack {
 
@@ -172,25 +176,57 @@ struct StarRewardView: View {
             .padding(.horizontal, 24)
             .padding(.top, 20)
 
+            // MARK: - View Achievement Jar Button
+
             NavigationLink(
                 destination: MyAchievmentJar(
                     animateStarDrop: true
                 )
             ) {
+
                 Text("View My Achievement Jar")
                     .font(.headline)
                     .foregroundColor(.white)
-                    .padding(.vertical, 12)
-                    .padding(.horizontal, 28)
+                    .frame(
+                        maxWidth: .infinity
+                    )
+                    .frame(height: 58)
                     .background(
-                        Color(
+
+                        isJarPressed
+
+                        ? Color(
+                            red: 0.337,
+                            green: 0.239,
+                            blue: 0.416
+                        )
+
+                        : Color(
                             red: 126/255,
                             green: 106/255,
                             blue: 158/255
                         )
                     )
-                    .cornerRadius(25)
+                    .clipShape(
+                        Capsule()
+                    )
             }
+            .buttonStyle(.plain)
+            .simultaneousGesture(
+
+                DragGesture(
+                    minimumDistance: 0
+                )
+                .onChanged { _ in
+
+                    isJarPressed = true
+                }
+                .onEnded { _ in
+
+                    isJarPressed = false
+                }
+            )
+            .padding(.horizontal, 35)
             .padding(.top, 690)
         }
 

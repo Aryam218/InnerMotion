@@ -12,6 +12,10 @@ struct SuggestionCategoryView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var selectedCategory: SuggestionCategory?
 
+    // MARK: - Continue Button Press State
+
+    @State private var isContinuePressed = false
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -25,9 +29,19 @@ struct SuggestionCategoryView: View {
                             dismiss()
                         } label: {
                             Image(systemName: "chevron.left")
-                                .font(.system(size: 20, weight: .medium))
-                                .foregroundStyle(Color(hex: "75608E"))
-                                .frame(width: 30, height: 30)
+                                .font(
+                                    .system(
+                                        size: 20,
+                                        weight: .medium
+                                    )
+                                )
+                                .foregroundStyle(
+                                    Color(hex: "75608E")
+                                )
+                                .frame(
+                                    width: 30,
+                                    height: 30
+                                )
                                 .contentShape(Rectangle())
                         }
                         .buttonStyle(.plain)
@@ -38,24 +52,49 @@ struct SuggestionCategoryView: View {
                     .padding(.top, 8)
 
                     Text("What do you need\nright now?")
-                        .font(.system(size: 36, weight: .regular))
-                        .foregroundStyle(Color(hex: "37008A"))
+                        .font(
+                            .system(
+                                size: 36,
+                                weight: .regular
+                            )
+                        )
+                        .foregroundStyle(
+                            Color(hex: "37008A")
+                        )
                         .multilineTextAlignment(.center)
                         .lineSpacing(2)
-                        .fixedSize(horizontal: false, vertical: true)
+                        .fixedSize(
+                            horizontal: false,
+                            vertical: true
+                        )
                         .frame(maxWidth: .infinity)
                         .padding(.top, 43)
 
-                    Text("Select what feels most helpful at this moment.")
-                        .font(.system(size: 16, weight: .regular))
-                        .foregroundStyle(Color(hex: "37008A"))
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal, 35)
-                        .padding(.top, 50)
+                    Text(
+                        "Select what feels most helpful at this moment."
+                    )
+                    .font(
+                        .system(
+                            size: 16,
+                            weight: .regular
+                        )
+                    )
+                    .foregroundStyle(
+                        Color(hex: "37008A")
+                    )
+                    .frame(
+                        maxWidth: .infinity,
+                        alignment: .leading
+                    )
+                    .padding(.horizontal, 35)
+                    .padding(.top, 50)
 
                     LazyVGrid(
                         columns: [
-                            GridItem(.fixed(159), spacing: 14),
+                            GridItem(
+                                .fixed(159),
+                                spacing: 14
+                            ),
                             GridItem(.fixed(159))
                         ],
                         spacing: 20
@@ -69,28 +108,82 @@ struct SuggestionCategoryView: View {
 
                     Spacer(minLength: 20)
 
+                    // MARK: - Continue
+
                     NavigationLink {
                         SuggestionPersonalizationView(
                             selectedCategory: selectedCategory
                         )
                     } label: {
+
                         Text("Continue")
-                            .font(.system(size: 22, weight: .regular))
+                            .font(
+                                .system(
+                                    size: 22,
+                                    weight: .regular
+                                )
+                            )
                             .foregroundStyle(.white)
-                            .frame(width: 270, height: 45)
+                            .frame(
+                                width: 270,
+                                height: 45
+                            )
                             .background(
+
                                 Capsule()
-                                    .fill(Color(hex: "75608E"))
+                                    .fill(
+
+                                        isContinuePressed
+
+                                        ? Color(
+                                            red: 0.337,
+                                            green: 0.239,
+                                            blue: 0.416
+                                        )
+
+                                        : Color(
+                                            hex: "75608E"
+                                        )
+                                    )
                             )
                     }
-                    .disabled(selectedCategory == nil)
-                    .opacity(selectedCategory == nil ? 0.55 : 1)
+                    .buttonStyle(.plain)
+                    .disabled(
+                        selectedCategory == nil
+                    )
+                    .opacity(
+                        selectedCategory == nil
+                        ? 0.55
+                        : 1
+                    )
+                    .simultaneousGesture(
+
+                        DragGesture(
+                            minimumDistance: 0
+                        )
+                        .onChanged { _ in
+
+                            if selectedCategory != nil {
+
+                                isContinuePressed = true
+                            }
+                        }
+                        .onEnded { _ in
+
+                            isContinuePressed = false
+                        }
+                    )
                     .padding(.bottom, 30)
                 }
             }
-            .toolbar(.hidden, for: .navigationBar)
+            .toolbar(
+                .hidden,
+                for: .navigationBar
+            )
         }
     }
+
+    // MARK: - Category Card
 
     private func categoryCard(
         for category: SuggestionCategory
@@ -112,20 +205,35 @@ struct SuggestionCategoryView: View {
                     )
 
                 Text(category.title)
-                    .font(.system(size: 20, weight: .regular))
-                    .foregroundStyle(Color(hex: "37008A"))
+                    .font(
+                        .system(
+                            size: 20,
+                            weight: .regular
+                        )
+                    )
+                    .foregroundStyle(
+                        Color(hex: "37008A")
+                    )
                     .multilineTextAlignment(.center)
                     .lineSpacing(0)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            .frame(width: 159, height: 148)
-            .background(
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(
-                        isSelected
-                        ? Color(hex: "E8DDF6")
-                        : Color(hex: "F5F0F0")
+                    .fixedSize(
+                        horizontal: false,
+                        vertical: true
                     )
+            }
+            .frame(
+                width: 159,
+                height: 148
+            )
+            .background(
+                RoundedRectangle(
+                    cornerRadius: 10
+                )
+                .fill(
+                    isSelected
+                    ? Color(hex: "E8DDF6")
+                    : Color(hex: "F5F0F0")
+                )
             )
         }
         .buttonStyle(.plain)
@@ -142,6 +250,7 @@ enum SuggestionCategory: String {
 
     var title: String {
         switch self {
+
         case .calm:
             return "Calm"
 
@@ -158,6 +267,7 @@ enum SuggestionCategory: String {
 
     var imageName: String {
         switch self {
+
         case .calm:
             return "calmIcon"
 
@@ -172,9 +282,9 @@ enum SuggestionCategory: String {
         }
     }
 
-    // كبرنا الصور داخل الكاردات
     var imageWidth: CGFloat {
         switch self {
+
         case .calm:
             return 100
 
@@ -191,6 +301,7 @@ enum SuggestionCategory: String {
 
     var imageHeight: CGFloat {
         switch self {
+
         case .calm:
             return 73
 
@@ -207,7 +318,9 @@ enum SuggestionCategory: String {
 
     var textSpacing: CGFloat {
         switch self {
-        case .lightMovement, .gentleConnection:
+
+        case .lightMovement,
+             .gentleConnection:
             return 3
 
         default:
@@ -220,12 +333,18 @@ enum SuggestionCategory: String {
 
 extension Color {
     init(hex: String) {
-        let cleanedHex = hex.trimmingCharacters(
-            in: CharacterSet.alphanumerics.inverted
-        )
+
+        let cleanedHex =
+            hex.trimmingCharacters(
+                in: CharacterSet.alphanumerics.inverted
+            )
 
         var value: UInt64 = 0
-        Scanner(string: cleanedHex).scanHexInt64(&value)
+
+        Scanner(
+            string: cleanedHex
+        )
+        .scanHexInt64(&value)
 
         let red: UInt64
         let green: UInt64
@@ -233,6 +352,7 @@ extension Color {
         let alpha: UInt64
 
         switch cleanedHex.count {
+
         case 8:
             red = value >> 24
             green = value >> 16 & 0xFF

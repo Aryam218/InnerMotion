@@ -22,6 +22,11 @@ struct PlanOneTask: View {
     @State private var isMakingEasier = false
     @State private var makeItEasierError: String? = nil
 
+    // MARK: - Button Press States
+
+    @State private var isStartPressed = false
+    @State private var isMakeItEasierPressed = false
+
     private var orderedSteps: [TaskStep] {
 
         task.steps.sorted {
@@ -217,8 +222,7 @@ struct PlanOneTask: View {
 
                     if !orderedSteps.isEmpty {
 
-                        goToFocusOneStep =
-                            true
+                        goToFocusOneStep = true
                     }
 
                 } label: {
@@ -227,17 +231,28 @@ struct PlanOneTask: View {
                         .font(
                             .system(size: 28)
                         )
+                        .foregroundStyle(.white)
                         .frame(
                             maxWidth: .infinity
                         )
                         .frame(height: 60)
+                        .background(
+
+                            isStartPressed
+
+                            ? Color(
+                                red: 0.337,
+                                green: 0.239,
+                                blue: 0.416
+                            )
+
+                            : Color.primaryButton
+                        )
+                        .clipShape(
+                            Capsule()
+                        )
                 }
-                .buttonStyle(
-                    PressableCapsuleStyle(
-                        fillColor:
-                            .primaryButton
-                    )
-                )
+                .buttonStyle(.plain)
                 .disabled(
                     orderedSteps.isEmpty
                     ||
@@ -250,11 +265,29 @@ struct PlanOneTask: View {
                     ? 0.55
                     : 1
                 )
+                .simultaneousGesture(
+
+                    DragGesture(
+                        minimumDistance: 0
+                    )
+                    .onChanged { _ in
+
+                        if !orderedSteps.isEmpty
+                            &&
+                            !isMakingEasier {
+
+                            isStartPressed = true
+                        }
+                    }
+                    .onEnded { _ in
+
+                        isStartPressed = false
+                    }
+                )
                 .padding(
                     .horizontal,
                     35
                 )
-
                 .navigationDestination(
                     isPresented:
                         $goToFocusOneStep
@@ -283,9 +316,7 @@ struct PlanOneTask: View {
                         if isMakingEasier {
 
                             ProgressView()
-                                .tint(
-                                    .primaryText
-                                )
+                                .tint(.white)
 
                             Text(
                                 "Making it Easier..."
@@ -301,17 +332,28 @@ struct PlanOneTask: View {
                     .font(
                         .system(size: 28)
                     )
+                    .foregroundStyle(.white)
                     .frame(
                         maxWidth: .infinity
                     )
                     .frame(height: 60)
-                }
-                .buttonStyle(
-                    PressableCapsuleStyle(
-                        fillColor:
-                            .secondaryButton
+                    .background(
+
+                        isMakeItEasierPressed
+
+                        ? Color(
+                            red: 0.337,
+                            green: 0.239,
+                            blue: 0.416
+                        )
+
+                        : Color.secondaryButton
                     )
-                )
+                    .clipShape(
+                        Capsule()
+                    )
+                }
+                .buttonStyle(.plain)
                 .disabled(
                     orderedSteps.isEmpty
                     ||
@@ -323,6 +365,25 @@ struct PlanOneTask: View {
                     isMakingEasier
                     ? 0.55
                     : 1
+                )
+                .simultaneousGesture(
+
+                    DragGesture(
+                        minimumDistance: 0
+                    )
+                    .onChanged { _ in
+
+                        if !orderedSteps.isEmpty
+                            &&
+                            !isMakingEasier {
+
+                            isMakeItEasierPressed = true
+                        }
+                    }
+                    .onEnded { _ in
+
+                        isMakeItEasierPressed = false
+                    }
                 )
                 .padding(
                     .horizontal,
@@ -339,7 +400,6 @@ struct PlanOneTask: View {
             for: .navigationBar
         )
     }
-
 
     // MARK: - Make Task Easier
 
@@ -439,6 +499,7 @@ struct PlanOneTask: View {
                 newSteps
 
             // إدخال الخطوات الجديدة
+
             for newStep in
                 newSteps {
 
