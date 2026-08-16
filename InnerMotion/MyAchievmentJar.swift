@@ -30,7 +30,6 @@ struct MyAchievmentJar: View {
 
     private let starImages = [
         "star",
-        "STAR1",
         "STAR2",
         "STAR3"
     ]
