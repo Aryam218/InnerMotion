@@ -30,6 +30,10 @@ struct HomeView: View {
     @State private var goToFocusTask = false
     @State private var goToPendingPlanning = false
 
+    // نحفظ الجلسة التي ضغط عليها المستخدم
+    // حتى لو حذف آخر Task أثناء وجوده داخل MyTasksView
+    @State private var selectedPendingPlanningSessionID: UUID?
+
     // MARK: - Notifications
 
     @AppStorage("notificationsEnabled")
@@ -361,7 +365,6 @@ struct HomeView: View {
                         )
 
                         // MARK: Feature 1
-                        // بدون تأثير ضغط
 
                         NavigationLink(
                             destination:
@@ -478,7 +481,6 @@ struct HomeView: View {
                         .buttonStyle(.plain)
 
                         // MARK: Feature 2
-                        // بدون تأثير ضغط
 
                         HStack(spacing: 14) {
 
@@ -723,6 +725,9 @@ struct HomeView: View {
                                 // MARK: Continue Planning Button
 
                                 Button {
+
+                                    selectedPendingPlanningSessionID =
+                                        pendingPlanningSessionID
 
                                     goToPendingPlanning =
                                         true
@@ -1078,12 +1083,16 @@ struct HomeView: View {
                 $goToPendingPlanning
         ) {
 
-            if let pendingPlanningSessionID {
+            if let selectedPendingPlanningSessionID {
 
                 MyTasksView(
                     sessionID:
-                        pendingPlanningSessionID
+                        selectedPendingPlanningSessionID
                 )
+
+            } else {
+
+                EmptyView()
             }
         }
 
