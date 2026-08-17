@@ -61,7 +61,7 @@ struct ContentView: View {
                         .opacity(textOpacity)
                         .scaleEffect(textScale)
                         .offset(y: textOffset)
-                        .padding(.top, 140)
+                        .padding(.top, 130)
                 }
                 .onAppear {
 
