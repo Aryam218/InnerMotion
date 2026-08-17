@@ -51,12 +51,12 @@ struct ContentView: View {
                     Text("Inner Motion")
                         .font(
                             .system(
-                                size: 34,
-                                weight: .bold,
-                                design: .rounded
+                                size: 30,
+                                weight: .semibold,
+                                design: .default
                             )
                         )
-                        .tracking(1.2)
+                        .tracking(0.2)
                         .foregroundColor(.appPrimary)
                         .opacity(textOpacity)
                         .scaleEffect(textScale)
