@@ -70,251 +70,260 @@ struct MyTasksView: View {
         blue: 0.945
     )
 
+    // MARK: - Body
+    //
+    // ملاحظة مهمة:
+    // ما نلف المحتوى بـ NavigationStack هنا لأن
+    // MyTasksView أصلًا توصلها push جوّا NavigationStack
+    // ثاني (من AddTaskView -> HomeView). لف NavigationStack
+    // جوّا NavigationStack ثاني يسبب تعشيش (nested stacks)
+    // وهذا يخلي SwiftUI أحيانًا يعيد استخدام Views قديمة
+    // بدل ما يبني وحدة جديدة (سبب رجوع القيم القديمة
+    // بصفحة PlanYourDayView).
+
     var body: some View {
 
-        NavigationStack {
+        ZStack {
 
-            ZStack {
+            pageBackground
+                .ignoresSafeArea()
 
-                pageBackground
-                    .ignoresSafeArea()
+            // MARK: - Navigate Home
 
-                // MARK: - Navigate Home
+            NavigationLink(
+                destination: MainTabView(),
+                isActive: $navigateHome
+            ) {
+                EmptyView()
+            }
 
-                NavigationLink(
-                    destination: MainTabView(),
-                    isActive: $navigateHome
-                ) {
-                    EmptyView()
+            VStack {
+
+                // MARK: - Top Bar
+
+                HStack {
+
+                    // MARK: Back Button
+
+                    Button {
+
+                        dismiss()
+
+                    } label: {
+
+                        Image(
+                            systemName: "chevron.left"
+                        )
+                        .font(
+                            .system(
+                                size: 20,
+                                weight: .medium
+                            )
+                        )
+                        .foregroundStyle(
+                            Color(hex: "75608E")
+                        )
+                        .frame(
+                            width: 32,
+                            height: 32
+                        )
+                        .contentShape(
+                            Rectangle()
+                        )
+                    }
+                    .buttonStyle(.plain)
+
+                    Spacer()
+
+                    // MARK: Home Button
+
+                    Button {
+
+                        navigateHome = true
+
+                    } label: {
+
+                        Image(
+                            systemName: "house"
+                        )
+                        .font(
+                            .system(
+                                size: 27,
+                                weight: .semibold
+                            )
+                        )
+                        .foregroundStyle(
+                            Color(hex: "75608E")
+                        )
+                        .frame(
+                            width: 38,
+                            height: 38
+                        )
+                        .contentShape(
+                            Rectangle()
+                        )
+                    }
+                    .buttonStyle(.plain)
                 }
+                .padding(.horizontal, 24)
+                .padding(.top, 10)
 
-                VStack {
+                // MARK: - Title
 
-                    // MARK: - Top Bar
+                VStack(spacing: 4) {
 
-                    HStack {
-
-                        // MARK: Back Button
-
-                        Button {
-
-                            dismiss()
-
-                        } label: {
-
-                            Image(
-                                systemName: "chevron.left"
+                    Text("My Tasks")
+                        .font(
+                            .system(
+                                size: 44,
+                                weight: .regular
                             )
-                            .font(
-                                .system(
-                                    size: 20,
-                                    weight: .medium
-                                )
-                            )
-                            .foregroundStyle(
-                                Color(hex: "75608E")
-                            )
-                            .frame(
-                                width: 32,
-                                height: 32
-                            )
-                            .contentShape(
-                                Rectangle()
-                            )
-                        }
-                        .buttonStyle(.plain)
+                        )
+                        .foregroundStyle(primary)
 
-                        Spacer()
+                    Text("Your tasks list")
+                        .font(
+                            .system(size: 18)
+                        )
+                        .foregroundStyle(secondary)
+                }
+                .padding(.top, 8)
 
-                        // MARK: Home Button
+                // MARK: - Current Session Tasks
 
-                        Button {
+                ScrollView {
 
-                            navigateHome = true
+                    VStack(spacing: 16) {
 
-                        } label: {
+                        ForEach(tasks) { task in
 
-                            Image(
-                                systemName: "house"
-                            )
-                            .font(
-                                .system(
-                                    size: 27,
-                                    weight: .semibold
-                                )
-                            )
-                            .foregroundStyle(
-                                Color(hex: "75608E")
-                            )
-                            .frame(
-                                width: 38,
-                                height: 38
-                            )
-                            .contentShape(
-                                Rectangle()
-                            )
-                        }
-                        .buttonStyle(.plain)
-                    }
-                    .padding(.horizontal, 24)
-                    .padding(.top, 10)
-
-                    // MARK: - Title
-
-                    VStack(spacing: 4) {
-
-                        Text("My Tasks")
-                            .font(
-                                .system(
-                                    size: 44,
-                                    weight: .regular
-                                )
-                            )
-                            .foregroundStyle(primary)
-
-                        Text("Your tasks list")
-                            .font(
-                                .system(size: 18)
-                            )
-                            .foregroundStyle(secondary)
-                    }
-                    .padding(.top, 8)
-
-                    // MARK: - Current Session Tasks
-
-                    ScrollView {
-
-                        VStack(spacing: 16) {
-
-                            ForEach(tasks) { task in
-
-                                SwipeToDeleteUserTaskCard(
-                                    task: task
-                                ) {
-                                    deleteTask(task)
-                                }
+                            SwipeToDeleteUserTaskCard(
+                                task: task
+                            ) {
+                                deleteTask(task)
                             }
                         }
-                        .padding(.horizontal, 24)
-                        .padding(.top, 32)
                     }
+                    .padding(.horizontal, 24)
+                    .padding(.top, 32)
+                }
 
-                    // MARK: - Buttons
+                // MARK: - Buttons
 
-                    VStack(spacing: 14) {
+                VStack(spacing: 14) {
 
-                        // MARK: Continue
+                    // MARK: Continue
 
-                        Button {
+                    Button {
+
+                        if !tasks.isEmpty {
+
+                            goToPlanYourDay = true
+                        }
+
+                    } label: {
+
+                        Text("Continue")
+                            .font(
+                                Font.title3.bold()
+                            )
+                            .foregroundStyle(.white)
+                            .frame(
+                                maxWidth: .infinity
+                            )
+                            .padding(.vertical, 18)
+                            .background(
+
+                                isContinuePressed
+
+                                ? pressedButtonColor
+                                : buttonColor
+
+                            )
+                            .clipShape(
+                                RoundedRectangle(
+                                    cornerRadius: 32
+                                )
+                            )
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(
+                        tasks.isEmpty
+                    )
+                    .opacity(
+                        tasks.isEmpty
+                        ? 0.55
+                        : 1
+                    )
+
+                    // نفس طريقة Start First Step
+                    .simultaneousGesture(
+
+                        DragGesture(
+                            minimumDistance: 0
+                        )
+                        .onChanged { _ in
 
                             if !tasks.isEmpty {
 
-                                goToPlanYourDay = true
+                                isContinuePressed = true
                             }
-
-                        } label: {
-
-                            Text("Continue")
-                                .font(
-                                    Font.title3.bold()
-                                )
-                                .foregroundStyle(.white)
-                                .frame(
-                                    maxWidth: .infinity
-                                )
-                                .padding(.vertical, 18)
-                                .background(
-
-                                    isContinuePressed
-
-                                    ? pressedButtonColor
-                                    : buttonColor
-
-                                )
-                                .clipShape(
-                                    RoundedRectangle(
-                                        cornerRadius: 32
-                                    )
-                                )
                         }
-                        .buttonStyle(.plain)
-                        .disabled(
-                            tasks.isEmpty
+                        .onEnded { _ in
+
+                            isContinuePressed = false
+                        }
+                    )
+
+                    .navigationDestination(
+                        isPresented:
+                            $goToPlanYourDay
+                    ) {
+
+                        PlanYourDayView(
+                            sessionID: sessionID
                         )
-                        .opacity(
-                            tasks.isEmpty
-                            ? 0.55
-                            : 1
-                        )
+                        .id(sessionID)
+                    }
 
-                        // نفس طريقة Start First Step
-                        .simultaneousGesture(
+                    // MARK: Add Another Task
 
-                            DragGesture(
-                                minimumDistance: 0
-                            )
-                            .onChanged { _ in
-
-                                if !tasks.isEmpty {
-
-                                    isContinuePressed = true
-                                }
-                            }
-                            .onEnded { _ in
-
-                                isContinuePressed = false
-                            }
-                        )
-
-                        .navigationDestination(
-                            isPresented:
-                                $goToPlanYourDay
-                        ) {
-
-                            PlanYourDayView(
+                    NavigationLink(
+                        destination:
+                            AddTaskView(
                                 sessionID: sessionID
                             )
-                        }
+                    ) {
 
-                        // MARK: Add Another Task
-
-                        NavigationLink(
-                            destination:
-                                AddTaskView(
-                                    sessionID: sessionID
+                        Text("Add another task")
+                            .font(
+                                Font.title3.bold()
+                            )
+                            .foregroundStyle(.white)
+                            .frame(
+                                maxWidth: .infinity
+                            )
+                            .padding(.vertical, 18)
+                            .background(
+                                Color(
+                                    red: 0.663,
+                                    green: 0.592,
+                                    blue: 0.741
                                 )
-                        ) {
-
-                            Text("Add another task")
-                                .font(
-                                    Font.title3.bold()
+                            )
+                            .clipShape(
+                                RoundedRectangle(
+                                    cornerRadius: 32
                                 )
-                                .foregroundStyle(.white)
-                                .frame(
-                                    maxWidth: .infinity
-                                )
-                                .padding(.vertical, 18)
-                                .background(
-                                    Color(
-                                        red: 0.663,
-                                        green: 0.592,
-                                        blue: 0.741
-                                    )
-                                )
-                                .clipShape(
-                                    RoundedRectangle(
-                                        cornerRadius: 32
-                                    )
-                                )
-                        }
-                        .buttonStyle(.plain)
+                            )
                     }
-                    .padding(.horizontal, 24)
-                    .padding(.bottom, 40)
+                    .buttonStyle(.plain)
                 }
+                .padding(.horizontal, 24)
+                .padding(.bottom, 40)
             }
-            .navigationBarHidden(true)
         }
+        .navigationBarHidden(true)
     }
 
     // MARK: - Delete Task
